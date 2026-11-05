@@ -16,15 +16,15 @@ canvas{width:100%;height:340px;display:block}.g{display:grid;grid-template-colum
 table{width:100%;border-collapse:collapse}td,th{padding:5px 4px;text-align:left;border-bottom:1px solid var(--ln);font-size:12px}th{color:var(--mu);font-weight:400}
 dialog{background:var(--cd);color:var(--ink);border:1px solid var(--ln);border-radius:12px;max-width:640px}dialog::backdrop{background:#000a}
 </style></head><body>
-<header><b>ProjectRiches</b><span class="mu">BTC 15-Min Kalshi Prediction</span><button id="how">How to Use</button><span class="pill m" id="rec">Record: 0W-0L</span><span class="pill m" id="stk">Streak: 0W</span><span id="pills"></span><button id="bV">Voice off</button><input id="ko" placeholder="Kalshi strike" inputmode="decimal" style="width:110px;background:var(--cd);color:var(--ink);border:1px solid var(--ln);border-radius:8px;padding:5px 8px" title="Type the strike shown on kalshi.com to override"><span class="mu" id="mode">Live Mode</span></header>
+<header><b>ProjectRiches</b><span class="mu">BTC 15-Min Kalshi Prediction</span><button id="how">How to Use</button><span class="pill m" id="rec"></span><span class="pill m" id="stk"></span><span id="pills"></span><button id="bV">Voice off</button><input id="ko" placeholder="Kalshi strike" inputmode="decimal" style="width:110px;background:var(--cd);color:var(--ink);border:1px solid var(--ln);border-radius:8px;padding:5px 8px" title="Type the strike shown on kalshi.com to override"><span class="mu" id="mode"></span></header>
 <div class="tiles" id="tiles"></div>
 <div class="main"><section class="card"><nav id="tabs"></nav>
-<div id="cw"><div id="tf"></div><canvas id="cv"></canvas><div class="mu" id="lg">EMA 9 (blue) · EMA 21 (orange) · SMA 50 (green) · strike (gold, dashed) · live exchange feed</div></div><div id="tb"></div></section>
+<div id="cw"><div id="tf"></div><canvas id="cv"></canvas><div class="mu" id="lg">EMA 9 (blue) · EMA 21 (orange) · SMA 50 (green) · strike (gold, dashed) · candles from Coinbase</div></div><div id="tb"></div></section>
 <aside class="card" id="call"></aside></div>
-<div class="card" id="pp" style="margin-bottom:12px"><b>Paper trading</b> <span class="mu">no real money · fills at the Kalshi ask when available, otherwise the model fair price</span><div style="margin:8px 0">Balance <b class="m" id="pb">$1,000.00</b> · Stake $<input id="pst" type="number" min="1" value="50" style="width:70px;background:var(--bg);color:var(--ink);border:1px solid var(--ln);border-radius:6px;padding:3px"> <label><input type="checkbox" id="pau"> auto-trade each locked call</label></div><button data-b="UP">Paper buy UP</button> <button data-b="DOWN">Paper buy DOWN</button> <button data-b="X">Cash out</button> <button data-b="R">Reset</button><div id="po" style="margin:8px 0"></div><table><tbody id="pl"></tbody></table></div>
-<div class="main"><section class="card"><b>Whale tape</b> <span class="mu">≥ $100,000 threshold</span><div id="wh"></div></section><section class="card"><b>Session history</b> <span class="mu" id="hs">0/0 hits</span><table><thead><tr><th>Window (ET)</th><th>Final call</th><th>Conf</th><th>Strike → close (60s avg)</th><th>Hit?</th></tr></thead><tbody id="hist"></tbody></table></section></div>
+<div class="card" id="pp" style="margin-bottom:12px"><b>Paper trading</b> <span class="mu">no real money · fills at the Kalshi ask when available, otherwise the model fair price</span><div style="margin:8px 0">Balance <b class="m" id="pb"></b> · Stake $<input id="pst" type="number" min="1" style="width:70px;background:var(--bg);color:var(--ink);border:1px solid var(--ln);border-radius:6px;padding:3px"> <label><input type="checkbox" id="pau"> auto-trade each locked call</label></div><button data-b="UP">Paper buy UP</button> <button data-b="DOWN">Paper buy DOWN</button> <button data-b="X">Cash out</button> <button data-b="R">Reset</button><div id="po" style="margin:8px 0"></div><table><tbody id="pl"></tbody></table></div>
+<div class="main"><section class="card"><b>Whale tape</b> <span class="mu">≥ $100,000 on Coinbase</span><div id="wh"></div></section><section class="card"><b>Session history</b> <span class="mu" id="hs"></span><table><thead><tr><th>Window (ET)</th><th>Final call</th><th>Conf</th><th>Strike → close (60s avg)</th><th>Hit?</th></tr></thead><tbody id="hist"></tbody></table></section></div>
 <p class="mu">Educational signals, not financial advice. Nothing here trades for you. Live strike pulled from Kalshi's 15-min series (KXBTC15M).</p>
-<dialog id="dlg"><b>How to use ProjectRiches</b><p>Each 15-minute Kalshi window has a strike. UP wins if BTC finishes above it, DOWN if below.</p><button onclick="dlg.close()">Close</button></dialog>
+<dialog id="dlg"><b>How to use ProjectRiches</b><p>Each 15-minute Kalshi window has a strike. UP wins if BTC finishes above it, DOWN if below.</p><p>The Call reads WARMING UP, then STANDBY while the model builds its read, then LOCKED around 8:00 into the window. Once locked, direction and confidence are frozen; only the countdown moves. An Early Read at 3:00 quietly feeds Hold Watch.</p><p><b>Cushion</b> compares how far price is past the strike with how far BTC typically still moves in the time left. <b>Fair value</b> compares the model's probability with Kalshi's ask (backend mode). <b>Smart skip</b> checks your own graded history for similar setups.</p><p>Tabs: Patterns (candle shapes), Market (exchange prices), Pressure (order flow), Tools (RSI, MACD, strike z-score, path model), Record (results by weekday). A SKIP means the round is too close to call; sitting out is part of the edge.</p><button onclick="dlg.close()">Close</button></dialog>
 <script>
 const $=i=>document.getElementById(i),W=9e5,LOCK=8,EARLY=3,WHALE=1e5,CB='https://api.exchange.coinbase.com/products/BTC-USD/';
 
@@ -42,7 +42,7 @@ const S={
 };
 
 const phi=z=>{const t=1/(1+.2316419*Math.abs(z)),p=.3989423*Math.exp(-z*z/2)*t*(.3193815+t*(-.3565638+t*(1.781478+t*(-1.821256+t*1.330274))));return z>0?1-p:p};
-const fm=n=>'$'+Math.abs(n||0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}),ar=s=>s==='UP'?'▲':'▼',cl=(v,a)=>Math.max(-a,Math.min(a,v||0));
+const fm=n=>'$'+Math.abs(n||0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}),ar=s=>s==='UP'?'▲':'▼',cl=(v,a)=>Math.max(-a,Math.min(a,v));
 const et=t=>new Date(t||Date.now()).toLocaleTimeString('en-US',{timeZone:'America/New_York',hour:'numeric',minute:'2-digit'}),mmss=ms=>{const s=Math.max(0,Math.floor((ms||0)/1e3));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
 
 const tj=async u=>{
@@ -73,6 +73,7 @@ async function feed(){
   S.blend = S.px;
 }
 
+// Resilient multi-attribute Kalshi strike parser
 async function kdirect(){
   const B='https://api.elections.kalshi.com/trade-api/v2';
   let markets = [];
