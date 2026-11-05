@@ -14,8 +14,7 @@ main{max-width:1000px;margin:0 auto;padding:10px}
 .strip .v.yes{color:var(--yes)} .strip .v.no{color:var(--no)} .strip .v.wait{color:var(--warn)}
 .top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:2px 0 12px;flex-wrap:wrap}
 .sl-brand{display:flex;align-items:center;gap:12px}
-.logo-img{height:38px;width:auto;filter:drop-shadow(0 0 8px rgba(0,255,136,0.35))}
-.sl-wm{font-size:22px;font-weight:800;font-style:italic;letter-spacing:.02em;line-height:1;font-family:inherit}
+.sl-wm{font-size:24px;font-weight:800;font-style:italic;letter-spacing:.02em;line-height:1;font-family:inherit}
 .sl-wm span{color:#fff}.sl-wm em{color:#00FF88;font-style:italic}
 .live{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--mute)}
 .dot{width:10px;height:10px;border-radius:50%;background:var(--mute)}.dot.ok{background:var(--yes)}.dot.bad{background:var(--no)}
@@ -45,6 +44,13 @@ main{max-width:1000px;margin:0 auto;padding:10px}
 .chartbox{overflow-x:auto}.chartbox svg{width:100%;height:auto;display:block}
 table{width:100%;border-collapse:collapse;font-size:13px} th,td{text-align:left;padding:7px 5px;border-bottom:1px solid var(--line)} th{color:var(--mute);font-weight:600}
 .mute{color:var(--mute)} .small{font-size:13px} .up{color:var(--yes)} .dn{color:var(--no)}
+.pgtabs{display:flex;gap:6px;padding:8px 0;margin:0 0 8px;background:var(--bg)}
+.pgtabs button{flex:1;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--mute);font-weight:700;cursor:pointer}
+.pgtabs button.on{background:var(--yes-bg);color:var(--yes);border-color:var(--yes)}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.chip{font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;border:1px solid var(--line)}
+.chip.yes{color:var(--yes);border-color:var(--yes);background:var(--yes-bg)}
+.chip.no{color:var(--no);border-color:var(--no);background:var(--no-bg)}
 </style>
 </head>
 <body>
@@ -59,20 +65,25 @@ table{width:100%;border-collapse:collapse;font-size:13px} th,td{text-align:left;
 
   <div class="top">
     <div class="sl-brand">
-      <img src="deitygowhite.jpg" alt="The Deity Don" class="logo-img">
       <div>
-        <div class="sl-wm"><span>THE DEITY DON</span></div>
-        <div class="small mute" style="letter-spacing:1px;font-size:10px">REAL SIGNALS · SMARTER PLAYS</div>
+        <div class="sl-wm"><span>THE DEITY DON</span> <em style="color:#00FF88">*</em></div>
+        <div class="small mute" style="letter-spacing:1px;font-size:10px">CAPTURING THE DIVINE IN THE ORDINARY</div>
       </div>
     </div>
     <div class="live"><span class="dot ok" id="dot"></span><span id="clock">connected · live feed</span></div>
+  </div>
+
+  <div class="pgtabs">
+    <button class="on" data-tab="bet">🎯 Bet & Now</button>
+    <button data-tab="chart">📈 Chart Viewer</button>
+    <button data-tab="stats">📊 Track Record</button>
   </div>
 
   <!-- THE VERDICT -->
   <section class="card" id="sec-now">
     <div class="nums">
       <div>
-        <div class="mute small" id="title">KXBTC15M · Active Window</div>
+        <div class="mute small" id="title">KXBTC15M · Active Window[cite: 1]</div>
         <div class="big" id="spot">$92,450.00</div>
         <div class="small" id="strike">Strike $92,400.00 · BTC is <b class="up">+$50.00 above: UP is winning</b></div>
       </div>
@@ -118,6 +129,11 @@ table{width:100%;border-collapse:collapse;font-size:13px} th,td{text-align:left;
   <section class="card" id="sec-chart">
     <div class="chead">
       <div class="sec" style="margin:0">Live Candlestick & Strike Tracker</div>
+      <div class="chips">
+        <span class="chip yes">EMA 9</span>
+        <span class="chip no">EMA 21</span>
+        <span class="chip">Strike Line</span>
+      </div>
     </div>
     <div class="chartbox" id="chart">
       <canvas id="cv"></canvas>
@@ -135,7 +151,7 @@ const S = {
   yes_ask: 0.60,
   yes_bid: 0.58,
   model_p: 0.62,
-  rsi: 54,
+  rsi: 52,
   c1: Array.from({length: 60}, (_, i) => {
     const base = 92400 + (Math.sin(i/4)*60);
     return [Date.now() - (60-i)*60000, base-10, base+20, base-20, base+5, Math.random()*10];
@@ -161,7 +177,7 @@ async function fetchMarket(){
 
   try{
     const B = 'https://api.elections.kalshi.com/trade-api/v2';
-    const res = await tj(B + '/markets?series_ticker=KXBTC15M&status=open&limit=10');
+    const res = await tj(B + '/markets?series_ticker=KXBTC15M&status=open&limit=10');[cite: 1]
     if(res && res.markets && res.markets.length) {
       const now = Date.now();
       const active = res.markets.filter(m => Date.parse(m.close_time) > now).sort((a,b)=>Math.abs(Date.parse(a.close_time) - now) - Math.abs(Date.parse(b.close_time) - now));
@@ -176,7 +192,6 @@ async function fetchMarket(){
     }
   }catch(_){}
 
-  // Push new minute candle
   const now = Date.now();
   const last = S.c1[S.c1.length - 1];
   if(now - last[0] > 60000) {
@@ -201,28 +216,25 @@ function drawChart(){
   const pad = (hi - lo) * 0.1 || 10; hi += pad; lo -= pad;
   const R = 60, bw = (w - R) / cs.length, Y = v => (hi - v) / (hi - lo) * (h - 20) + 10;
 
-  // Grid
-  x.strokeStyle = 'var(--line)'; x.lineWidth = 1; x.font = '10px monospace'; x.fillStyle = 'var(--mute)';
+  x.strokeStyle = '#1c2a25'; x.lineWidth = 1; x.font = '10px monospace'; x.fillStyle = '#9aa6a1';
   for(let i=0; i<=4; i++){
     const val = lo + (hi - lo)*(i/4), y = Y(val);
     x.beginPath(); x.moveTo(0, y); x.lineTo(w - R, y); x.stroke();
     x.fillText(val.toFixed(0), w - R + 6, y + 4);
   }
 
-  // Candles
   cs.forEach((k, i) => {
     const cx = i * bw + bw/2, up = k[4] >= k[1];
-    x.strokeStyle = up ? 'var(--yes)' : 'var(--no)';
+    x.strokeStyle = up ? '#2fbf8f' : '#e5605d';
     x.beginPath(); x.moveTo(cx, Y(k[2])); x.lineTo(cx, Y(k[3])); x.stroke();
-    x.fillStyle = up ? 'var(--yes)' : 'var(--no)';
+    x.fillStyle = up ? '#2fbf8f' : '#e5605d';
     x.fillRect(cx - bw*0.35, Y(Math.max(k[1], k[4])), bw*0.7, Math.max(1, Math.abs(Y(k[1]) - Y(k[4]))));
   });
 
-  // Strike Line
-  x.setLineDash([4,4]); x.strokeStyle = 'var(--gold)';
+  x.setLineDash([4,4]); x.strokeStyle = '#ffc83d';
   x.beginPath(); x.moveTo(0, Y(S.strike)); x.lineTo(w - R, Y(S.strike)); x.stroke();
   x.setLineDash([]);
-  x.fillStyle = 'var(--gold)'; x.fillRect(w - R, Y(S.strike)-9, R, 18);
+  x.fillStyle = '#ffc83d'; x.fillRect(w - R, Y(S.strike)-9, R, 18);
   x.fillStyle = '#000'; x.fillText(S.strike.toFixed(0), w - R + 4, Y(S.strike)+4);
 }
 
@@ -235,21 +247,6 @@ function render(){
   $('cd').textContent = mmss(timeLeft);
   $('stTime').textContent = mmss(timeLeft);
 
-  // Ticker tiles
-  $('tPrice').textContent = fm(S.spot);
-  $('tStrike').textContent = fm(S.strike);
-  $('tGap').textContent = (diff >= 0 ? '+' : '') + fm(diff);
-  $('tGap').className = 'v ' + (diff >= 0 ? 'up' : 'dn');
-  $('tGapPct').textContent = ((diff / S.strike)*100).toFixed(3) + '%';
-
-  // Track bar markers
-  const mkt = S.yes_ask || 0.60;
-  $('mkMkt').style.left = (mkt * 100) + '%';
-  $('lMkt').textContent = `Kalshi ${Math.round(mkt*100)}¢`;
-  $('mkModel').style.left = (S.model_p * 100) + '%';
-  $('lModel').textContent = `Model ${Math.round(S.model_p*100)}%`;
-
-  // Verdict tiles
   const upWin = diff >= 0;
   const callTile = $('callTile');
   callTile.className = 'tile ' + (upWin ? 'yes' : 'no');
@@ -261,7 +258,6 @@ function render(){
   $('tradeHead').textContent = S.yes_ask <= 0.65 ? 'Buy UP at 62¢ or less' : 'Priced fairly · wait for pullback';
   $('tradeTxt').innerHTML = `Kalshi asks ${Math.round(S.yes_ask*100)}¢. Model fair value is ${Math.round(S.model_p*100)}¢. Positive edge confirmed after fees.`;
 
-  // Strip updates
   $('stCall').textContent = upWin ? 'UP winning' : 'DOWN winning';
   $('stCall').className = 'v ' + (upWin ? 'yes' : 'no');
   $('stTrade').textContent = upWin ? 'Buy UP ≤ 62¢' : 'Buy DOWN ≤ 40¢';
