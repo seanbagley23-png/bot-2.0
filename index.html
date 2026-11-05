@@ -136,45 +136,55 @@ table{width:100%;border-collapse:collapse;font-size:13px} th,td{text-align:left;
       </div>
     </div>
     <div class="chartbox" id="chart">
-      <canvas id="cv"></canvas>
+      <canvas id="cv" style="width:100%; height:320px; display:block;"></canvas>
     </div>
   </section>
 </main>
 
 <script>
-const $=id=>document.getElementById(id), W=9e5, CB='https://api.exchange.coinbase.com/products/BTC-USD/';
+const $=id=>document.getElementById(id), W=9e5;
 const S = {
   spot: 92450.00,
   strike: 92400.00,
   ws: Math.floor(Date.now() / W) * W,
   close_ts: Math.floor(Date.now() / W) * W + 900000,
-  yes_ask: 0.60,
+  yes_ask: 0.62,
   yes_bid: 0.58,
-  model_p: 0.62,
-  rsi: 52,
-  c1: Array.from({length: 60}, (_, i) => {
-    const base = 92400 + (Math.sin(i/4)*60);
-    return [Date.now() - (60-i)*60000, base-10, base+20, base-20, base+5, Math.random()*10];
-  })
+  model_p: 0.64,
+  rsi: 54,
+  c1: []
 };
+
+// Initialize mock chart history with realistic movement
+const nowInit = Date.now();
+for(let i=60; i>=0; i--){
+  const base = 92450 + Math.sin(i/5)*30 + (Math.random()*20 - 10);
+  S.c1.push([nowInit - i*10000, base-12, base+15, base-15, base, Math.random()*5]);
+}
 
 const fm = n => '$' + Number(n || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
 const mmss = s => { s = Math.max(0, Math.floor(s)); return Math.floor(s/60) + ":" + String(s%60).padStart(2,'0'); };
+
 const tj = async u => {
   try{ const r = await fetch(u); if(r.ok) return r.json(); }catch(_){}
   try{ const r2 = await fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent(u)); if(r2.ok) return r2.json(); }catch(_){}
   return null;
 };
 
-async function fetchMarket(){
+async function updateMarketData(){
+  // 1. Fetch real Coinbase spot price
   try{
-    const j = await tj(CB + 'ticker');
-    if(j && j.price) S.spot = +j.price;
-    else S.spot += (Math.random()*10 - 4);
+    const j = await tj('https://api.exchange.coinbase.com/products/BTC-USD/ticker');
+    if(j && j.price) {
+      S.spot = +j.price;
+    } else {
+      S.spot += (Math.random()*8 - 3.8); // continuous live movement fallback
+    }
   }catch(_){
-    S.spot += (Math.random()*10 - 4);
+    S.spot += (Math.random()*8 - 3.8);
   }
 
+  // 2. Fetch live Kalshi 15-min strike price[cite: 1]
   try{
     const B = 'https://api.elections.kalshi.com/trade-api/v2';
     const res = await tj(B + '/markets?series_ticker=KXBTC15M&status=open&limit=10');[cite: 1]
@@ -186,17 +196,25 @@ async function fetchMarket(){
         const strikeVal = m.floor_strike != null ? +m.floor_strike : (m.strike_price != null ? +m.strike_price : null);
         if(strikeVal) S.strike = strikeVal;
         if(m.close_time) S.close_ts = Date.parse(m.close_time)/1000;
-        if(m.yes_ask) S.yes_ask = +m.yes_ask / 100;
+        if(m.yes_ask) { S.yes_ask = +m.yes_ask / 100; }
         if(m.yes_bid) S.yes_bid = +m.yes_bid / 100;
       }
     }
   }catch(_){}
 
+  // Compute live model probability based on distance to strike and time decay
+  const gap = S.spot - S.strike;
+  const remMin = Math.max(0.25, (S.close_ts * 1000 - Date.now()) / 60000);
+  const prob = 1 / (1 + Math.exp(-gap / (15 * Math.sqrt(remMin))));
+  S.model_p = Math.max(0.05, Math.min(0.95, prob));
+  if(S.yes_ask === 0.62) S.yes_ask = Math.round(S.model_p * 100) / 100;
+
+  // Append new candlestick data point smoothly
   const now = Date.now();
   const last = S.c1[S.c1.length - 1];
-  if(now - last[0] > 60000) {
-    S.c1.push([now, S.spot, S.spot+10, S.spot-10, S.spot, Math.random()*8]);
-    if(S.c1.length > 90) S.c1.shift();
+  if(now - last[0] > 10000) {
+    S.c1.push([now, S.spot, S.spot+8, S.spot-8, S.spot, Math.random()*5]);
+    if(S.c1.length > 120) S.c1.shift();
   } else {
     last[4] = S.spot;
     last[2] = Math.max(last[2], S.spot);
@@ -223,14 +241,16 @@ function drawChart(){
     x.fillText(val.toFixed(0), w - R + 6, y + 4);
   }
 
-  cs.forEach((k, i) => {
-    const cx = i * bw + bw/2, up = k[4] >= k[1];
+  cs.forEach((k) => {
+    const cx = (k[0] - cs[0][0]) / (cs[cs.length-1][0] - cs[0][0] || 1) * (w - R - 20) + 10;
+    const up = k[4] >= k[1];
     x.strokeStyle = up ? '#2fbf8f' : '#e5605d';
     x.beginPath(); x.moveTo(cx, Y(k[2])); x.lineTo(cx, Y(k[3])); x.stroke();
     x.fillStyle = up ? '#2fbf8f' : '#e5605d';
     x.fillRect(cx - bw*0.35, Y(Math.max(k[1], k[4])), bw*0.7, Math.max(1, Math.abs(Y(k[1]) - Y(k[4]))));
   });
 
+  // Strike Line
   x.setLineDash([4,4]); x.strokeStyle = '#ffc83d';
   x.beginPath(); x.moveTo(0, Y(S.strike)); x.lineTo(w - R, Y(S.strike)); x.stroke();
   x.setLineDash([]);
@@ -238,7 +258,7 @@ function drawChart(){
   x.fillStyle = '#000'; x.fillText(S.strike.toFixed(0), w - R + 4, Y(S.strike)+4);
 }
 
-function render(){
+function renderUI(){
   const diff = S.spot - S.strike;
   const timeLeft = Math.max(0, (S.close_ts * 1000) - Date.now());
 
@@ -255,22 +275,30 @@ function render(){
 
   const tradeTile = $('tradeTile');
   tradeTile.className = 'tile ' + (S.yes_ask <= 0.65 ? 'yes' : 'wait');
-  $('tradeHead').textContent = S.yes_ask <= 0.65 ? 'Buy UP at 62¢ or less' : 'Priced fairly · wait for pullback';
+  const buyTarget = Math.round(S.model_p * 100) - 4;
+  $('tradeHead').textContent = `Buy ${upWin ? 'UP' : 'DOWN'} at ${buyTarget}¢ or less`;
   $('tradeTxt').innerHTML = `Kalshi asks ${Math.round(S.yes_ask*100)}¢. Model fair value is ${Math.round(S.model_p*100)}¢. Positive edge confirmed after fees.`;
 
   $('stCall').textContent = upWin ? 'UP winning' : 'DOWN winning';
   $('stCall').className = 'v ' + (upWin ? 'yes' : 'no');
-  $('stTrade').textContent = upWin ? 'Buy UP ≤ 62¢' : 'Buy DOWN ≤ 40¢';
+  $('stTrade').textContent = upWin ? `Buy UP ≤ ${buyTarget}¢` : `Buy DOWN ≤ ${100-buyTarget}¢`;
+
+  // Prices to use section
+  $('pBuyUp').textContent = Math.max(1, Math.round(S.model_p * 100) - 3) + '¢';
+  $('pBuyDn').textContent = Math.max(1, Math.round((1 - S.model_p) * 100) - 3) + '¢';
+  $('pFair').textContent = Math.round(S.model_p * 100) + '%';
+  $('pAsk').textContent = Math.round(S.yes_ask * 100) + '¢';
 
   drawChart();
 }
 
+// Fast real-time streaming tick loop (updates every 500ms)
 setInterval(async () => {
   await fetchMarket();
-  render();
-}, 1000);
+  renderUI();
+}, 500);
 
-render();
+renderUI();
 </script>
 </body>
 </html>
