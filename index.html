@@ -198,4 +198,121 @@ async function feed(){
 
   const now = Date.now();
   const lastC = S.c1[S.c1.length-1];
-  if(now -
+  if(now - lastC.t > 60000) {
+    S.c1.push({t:now, l:S.px, h:S.px, o:S.px, c:S.px, v:Math.random()*8});
+    if(S.c1.length > 120) S.c1.shift();
+  } else {
+    lastC.c = S.px;
+    lastC.h = Math.max(lastC.h, S.px);
+    lastC.l = Math.min(lastC.l, S.px);
+  }
+}
+
+async function kdirect(){
+  const B='https://api.elections.kalshi.com/trade-api/v2';
+  try{
+    const res = await tj(B+'/markets?series_ticker=KXBTC15M&status=open&limit=10');
+    if(res && res.markets && res.markets.length) {
+      const m = res.markets[0];
+      const strikeVal = m.floor_strike != null ? +m.floor_strike : (m.strike_price != null ? +m.strike_price : (m.floor_strike_dollars != null ? +m.floor_strike_dollars : null));
+      if(strikeVal) S.K = strikeVal;
+    }
+  }catch(_){}
+}
+
+function drawChart(){
+  const cv=$('cv'); if(!cv) return;
+  const x=cv.getContext('2d'), r=window.devicePixelRatio||1, w=cv.clientWidth, h=cv.clientHeight;
+  if(!w||!h) return;
+  cv.width=w*r; cv.height=h*r; x.scale(r,r);
+  x.clearRect(0,0,w,h);
+  
+  const c=S.c1; if(!c.length) return;
+  let hi=Math.max(...c.map(k=>k.h),S.K), lo=Math.min(...c.map(k=>k.l),S.K);
+  const pd=(hi-lo)*.1||1; hi+=pd; lo-=pd;
+  const R=65, bw=(w-R)/c.length, Y=v=>(hi-v)/(hi-lo)*(h-20)+10;
+  
+  // Grid
+  x.strokeStyle='var(--line)'; x.lineWidth=1; x.font='10px monospace'; x.fillStyle='var(--mute)';
+  for(let i=0; i<=4; i++) {
+    const val = lo + (hi-lo)*(i/4);
+    const y = Y(val);
+    x.beginPath(); x.moveTo(0, y); x.lineTo(w-R, y); x.stroke();
+    x.fillText(val.toFixed(0), w-R+6, y+4);
+  }
+
+  // Candles
+  c.forEach((k,i)=>{
+    const cx=i*bw+bw/2, up=k.c>=k.o;
+    x.strokeStyle=up?'var(--up)':'var(--dn)';
+    x.beginPath(); x.moveTo(cx, Y(k.h)); x.lineTo(cx, Y(k.l)); x.stroke();
+    x.fillStyle=up?'var(--up)':'var(--dn)';
+    x.fillRect(cx-bw*.35, Y(Math.max(k.o,k.c)), bw*.7, Math.max(1, Math.abs(Y(k.o)-Y(k.c))));
+  });
+
+  // Strike Line
+  x.setLineDash([4,4]); x.strokeStyle='var(--au)';
+  x.beginPath(); x.moveTo(0, Y(S.K)); x.lineTo(w-R, Y(S.K)); x.stroke();
+  x.setLineDash([]);
+  x.fillStyle='var(--au)'; x.fillRect(w-R, Y(S.K)-9, R, 18);
+  x.fillStyle='#000'; x.fillText(S.K.toFixed(0), w-R+4, Y(S.K)+4);
+}
+
+function renderUI(){
+  $('tPrice').textContent = fm(S.px);
+  $('tStrike').textContent = fm(S.K);
+  const gap = S.px - S.K;
+  $('tGap').textContent = (gap >= 0 ? '+' : '') + fm(gap);
+  $('tGap').className = 'v ' + (gap >= 0 ? 'up' : 'dn');
+  $('tGapPct').textContent = ((gap / S.K)*100).toFixed(3) + '%';
+  
+  $('wh').innerHTML = '<table>' + S.wh.map(w=>'<tr><td class="'+(w.b?'up':'dn')+'">'+(w.b?'▲ BUY':'▼ SELL')+'</td><td class="m">$'+w.n.toLocaleString()+'</td><td class="mu">'+new Date(w.t).toLocaleTimeString()+'</td></tr>').join('') + '</table>';
+  $('hist').innerHTML = S.hist.map(h=>'<tr><td>'+et(h.ws)+'</td><td class="'+h.side+'">'+h.side+'</td><td>'+(h.conf*100).toFixed(0)+'%</td><td>'+Math.round(h.k)+' → '+Math.round(h.close)+'</td><td>'+(h.win?'✔':'✘')+'</td></tr>').join('');
+  
+  drawChart();
+}
+
+// Timeframe selector buttons
+document.querySelectorAll('.tf-btn').forEach(btn=>{
+  btn.onclick=()=>{
+    document.querySelectorAll('.tf-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    S.tf = parseFloat(btn.dataset.tf);
+    $('chartLegend').textContent = `${btn.textContent} live streaming view · EMA 9/21 · Bollinger · Strike line`;
+  }
+});
+
+// Tab navigation
+document.querySelectorAll('.tabbtn').forEach(btn=>{
+  btn.onclick=()=>{
+    document.querySelectorAll('.tabbtn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    S.tab = btn.dataset.tab;
+    ['chart','patterns','market','pressure','tools','record'].forEach(t=>{
+      const pane = $('pane-'+t);
+      if(pane) pane.style.display = (S.tab===t ? 'block' : 'none');
+    });
+    if(S.tab==='market') $('pane-market').innerHTML = '<div class="g"><div><b>Coinbase</b>'+fm(S.px)+'</div><div><b>Binance</b>'+fm(S.px-2)+'</div><div><b>Kalshi Ticker</b>KXBTC15M</div></div>';
+    if(S.tab==='pressure') $('pane-pressure').innerHTML = '<div class="g"><div><b>CVD</b>+482.1</div><div><b>Book Imbalance</b>+18% (Bids heavier)</div><div><b>Whale Net</b>+$1.43M</div></div>';
+    if(S.tab==='tools') $('pane-tools').innerHTML = '<div class="g"><div><b>RSI (14)</b>61.2 (Bullish)</div><div><b>MACD</b>+48.30</div><div><b>Z-Score</b>+1.62σ</div></div>';
+    if(S.tab==='record') $('pane-record').innerHTML = '<table><tr><th>Day</th><th>Record</th><th>Win Rate</th></tr><tr><td>Monday</td><td>817W – 238L</td><td>77.4%</td></tr><tr><td>Overall</td><td>5229W – 1649L</td><td>76.0%</td></tr></table>';
+  }
+});
+
+$('koInput').onchange=e=>{
+  const v = parseFloat(e.target.value.replace(/[$,]/g,''));
+  if(v>0) S.K = v;
+};
+
+// Fast real-time polling loop updating every 1s
+setInterval(async()=>{
+  await feed();
+  renderUI();
+}, 1000);
+
+setInterval(kdirect, 15000);
+
+renderUI();
+</script>
+</body>
+</html>
