@@ -3,15 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>The Deity Don — BTC 15-Min Kalshi Prediction</title>
+<title>Deity&lt;3Kalshi — BTC 15-Min Prediction Engine</title>
 <style>
 :root{color-scheme:dark;--bg:#0b0d10;--cd:#12151a;--ln:#242a33;--ink:#e9edf2;--mu:#8b95a3;--up:#3ddc84;--dn:#ff4d6d;--au:#f5c542;--blue:#4aa3ff;--purple:#b066ff}
-[data-theme="light"]{--bg:#f4f6f9;--cd:#ffffff;--ln:#d0d7de;--ink:#1f2328;--mu:#656d76;--up:#1a7f37;--dn:#cf222e;--au:#9a6700;--blue:#0969da;--purple:#8250df}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:13px/1.45 Inter,system-ui,sans-serif;padding:12px 14px}
 .m{font-family:ui-monospace,Menlo,monospace}.mu{color:var(--mu)}.UP,.up{color:var(--up)}.DOWN,.dn{color:var(--dn)}.au{color:var(--au)}
 header{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-bottom:12px;border-bottom:1px solid var(--ln);padding-bottom:10px}
 .brand{display:flex;align-items:center;gap:12px}
-.logo-img{height:36px;width:auto;filter:drop-shadow(0 0 8px rgba(255,255,255,0.25))}
+.logo-text{font-size:20px;font-weight:900;font-style:italic;letter-spacing:-0.5px;color:#fff;background:linear-gradient(45deg,#fff,#888);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 .pill{border:1px solid var(--ln);border-radius:20px;padding:4px 12px;font-size:12px;background:var(--cd);display:inline-flex;align-items:center;gap:6px}
 .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--dn)}.dot.ok{background:var(--up)}
 button{font:inherit;background:var(--cd);color:var(--ink);border:1px solid var(--ln);border-radius:8px;padding:6px 12px;cursor:pointer}button.on{background:var(--blue);border-color:var(--blue);color:#fff}button:focus-visible{outline:2px solid var(--au)}
@@ -40,8 +39,8 @@ footer{margin-top:20px;text-align:center;font-size:11px;color:var(--mu)}
 
 <header>
   <div class="brand">
-    <img src="deitygowhite.jpg" alt="The Deity Don" class="logo-img">
-    <div class="pill" id="liveStateBadge"><span class="dot ok"></span><span id="stateText">Live Market Streaming Active</span></div>
+    <div class="logo-text">The Deity Don*</div>
+    <div class="pill" id="liveStateBadge"><span class="dot ok"></span><span id="stateText">Live Streaming & Kalshi Sync Active</span></div>
   </div>
   <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
     <div class="pill" id="chipRecord">Record: 58W–20L (74.4%)</div>
@@ -57,7 +56,7 @@ footer{margin-top:20px;text-align:center;font-size:11px;color:var(--mu)}
 
 <div class="tiles">
   <div class="tile"><div class="lbl">Blended BTC Price</div><div class="val" id="tPrice">$92,450.00</div><div class="sub" id="tPriceSrc">Live Coinbase + Kraken</div></div>
-  <div class="tile"><div class="lbl">Kalshi Strike</div><div class="val" id="tStrike">$92,400.00</div><div class="sub" id="tStrikeSrc">KXBTC15M</div></div>
+  <div class="tile"><div class="lbl">Kalshi Strike</div><div class="val" id="tStrike">$92,400.00</div><div class="sub" id="tStrikeSrc">KXBTC15M[cite: 1]</div></div>
   <div class="tile"><div class="lbl">Target Gap</div><div class="val up" id="tGap">+$50.00</div><div class="sub" id="tGapPct">+0.054%</div></div>
   <div class="tile"><div class="lbl">Flip Watch</div><div class="val" id="tFusedProb">48%</div><div class="sub" id="tFusedProbSub">watching · Active level</div></div>
   <div class="tile"><div class="lbl">Whale Trend</div><div class="val up" id="tWhaleTrend">▲ UP</div><div class="sub" id="tWhaleTrendSub">Net buy flow active</div></div>
@@ -78,7 +77,7 @@ footer{margin-top:20px;text-align:center;font-size:11px;color:var(--mu)}
     <div id="tabContent">
       <div id="pane-chart">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-size:11px;color:var(--mu)">
-          <span id="chartLegend">Multi-timeframe viewer · EMA 9/21 · Bollinger · Strike line</span>
+          <span id="chartLegend">Multi-timeframe live streaming · EMA 9/21 · Bollinger · Strike line</span>
           <div>
             <button class="chip tf-btn" data-tf="0.25">15s</button>
             <button class="chip tf-btn" data-tf="0.5">30s</button>
@@ -199,7 +198,6 @@ async function feed(){
   S.ex['Coinbase'] = S.px;
   S.ex['Kraken'] = S.px + 1.2;
 
-  // Append & update active live candlestick
   const now = Date.now();
   const lastC = S.c1[S.c1.length-1];
   if(now - lastC.t > 60000) {
@@ -315,7 +313,7 @@ $('koInput').onchange=e=>{
   if(v>0) S.K = v;
 };
 
-// Fast real-time polling loop
+// Fast real-time polling loop updating every 1s
 setInterval(async()=>{
   await feed();
   renderUI();
