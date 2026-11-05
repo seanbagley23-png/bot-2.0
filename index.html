@@ -1,256 +1,106 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>ProjectRiches</title>
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Strikeline — BTC 15-Min Kalshi Prediction</title>
 <style>
-:root{color-scheme:dark;--bg:#0b0d10;--cd:#12151a;--ln:#242a33;--ink:#e9edf2;--mu:#8b95a3;--up:#3ddc84;--dn:#ff4d6d;--au:#f5c542}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:13px/1.45 ui-sans-serif,system-ui,sans-serif;padding:12px 14px}
+:root{color-scheme:dark;--bg:#0b0d10;--cd:#12151a;--ln:#242a33;--ink:#e9edf2;--mu:#8b95a3;--up:#3ddc84;--dn:#ff4d6d;--au:#f5c542;--blue:#4aa3ff;--purple:#b066ff}
+[data-theme="light"]{--bg:#f4f6f9;--cd:#ffffff;--ln:#d0d7de;--ink:#1f2328;--mu:#656d76;--up:#1a7f37;--dn:#cf222e;--au:#9a6700;--blue:#0969da;--purple:#8250df}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:13px/1.45 Inter,system-ui,sans-serif;padding:12px 14px}
 .m{font-family:ui-monospace,Menlo,monospace}.mu{color:var(--mu)}.UP,.up{color:var(--up)}.DOWN,.dn{color:var(--dn)}.au{color:var(--au)}
 header{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}header b{font-size:18px;margin-right:6px}
-.pill{border:1px solid var(--ln);border-radius:20px;padding:3px 10px;font-size:12px}.pill i{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px;background:var(--dn)}.pill i.on{background:var(--up)}
-button{font:inherit;background:var(--cd);color:var(--ink);border:1px solid var(--ln);border-radius:8px;padding:5px 10px;cursor:pointer}button.on{background:#1f4ea0;border-color:#1f4ea0}button:focus-visible{outline:2px solid var(--au)}
-.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:8px;margin-bottom:12px}.tile,.card{background:var(--cd);border:1px solid var(--ln);border-radius:10px;padding:10px 12px}.tile .k{font-size:11px;color:var(--mu);text-transform:uppercase}.tile .v{font-size:19px;font-weight:700}.tile .s{font-size:11px;color:var(--mu);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.main{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(300px,1fr);gap:12px;margin-bottom:12px}@media(max-width:900px){.main{grid-template-columns:1fr}}
-nav{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px}nav button{border:0;background:none;color:var(--mu);border-bottom:2px solid transparent;border-radius:0}nav button.on{background:none;color:var(--ink);border-color:var(--up)}
-canvas{width:100%;height:340px;display:block}.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}.g div{border:1px solid var(--ln);border-radius:8px;padding:8px 10px}.g b{font-size:17px;display:block}
-#call{border-color:#1e6b43;background:linear-gradient(#10261a,#12151a 60%)}#call.DOWN{border-color:#7a2236;background:linear-gradient(#2a1119,#12151a 60%)}#call.x{border-color:var(--ln);background:var(--cd)}
-.big{font-size:40px;font-weight:800;text-align:center;line-height:1.1}.c{text-align:center}.bar{height:7px;border-radius:4px;background:var(--dn);overflow:hidden;margin:8px 0}.bar i{display:block;height:100%;background:var(--up)}
-.box{border:1px solid var(--ln);border-radius:8px;padding:8px 10px;margin:8px 0}.chip{display:inline-block;border:1px solid var(--ln);border-radius:6px;padding:1px 7px;margin:2px 2px 0 0;font-size:12px}.chip.UP{border-color:#1e6b43}.chip.DOWN{border-color:#7a2236}.chip.d{background:#1e6b43;color:#fff}
-table{width:100%;border-collapse:collapse}td,th{padding:5px 4px;text-align:left;border-bottom:1px solid var(--ln);font-size:12px}th{color:var(--mu);font-weight:400}
-dialog{background:var(--cd);color:var(--ink);border:1px solid var(--ln);border-radius:12px;max-width:640px}dialog::backdrop{background:#000a}
-</style></head><body>
-<header><b>ProjectRiches</b><span class="mu">BTC 15-Min Kalshi Prediction</span><button id="how">How to Use</button><span class="pill m" id="rec"></span><span class="pill m" id="stk"></span><span id="pills"></span><button id="bV">Voice off</button><input id="ko" placeholder="Kalshi strike" inputmode="decimal" style="width:110px;background:var(--cd);color:var(--ink);border:1px solid var(--ln);border-radius:8px;padding:5px 8px" title="Type the strike shown on kalshi.com to override"><span class="mu" id="mode"></span></header>
-<div class="tiles" id="tiles"></div>
-<div class="main"><section class="card"><nav id="tabs"></nav>
-<div id="cw"><div id="tf"></div><canvas id="cv"></canvas><div class="mu" id="lg">EMA 9 (blue) · EMA 21 (orange) · SMA 50 (green) · strike (gold, dashed) · candles from Coinbase</div></div><div id="tb"></div></section>
-<aside class="card" id="call"></aside></div>
-<div class="card" id="pp" style="margin-bottom:12px"><b>Paper trading</b> <span class="mu">no real money · fills at the Kalshi ask when available, otherwise the model fair price</span><div style="margin:8px 0">Balance <b class="m" id="pb"></b> · Stake $<input id="pst" type="number" min="1" style="width:70px;background:var(--bg);color:var(--ink);border:1px solid var(--ln);border-radius:6px;padding:3px"> <label><input type="checkbox" id="pau"> auto-trade each locked call</label></div><button data-b="UP">Paper buy UP</button> <button data-b="DOWN">Paper buy DOWN</button> <button data-b="X">Cash out</button> <button data-b="R">Reset</button><div id="po" style="margin:8px 0"></div><table><tbody id="pl"></tbody></table></div>
-<div class="main"><section class="card"><b>Whale tape</b> <span class="mu">≥ $100,000 on Coinbase</span><div id="wh"></div></section><section class="card"><b>Session history</b> <span class="mu" id="hs"></span><table><thead><tr><th>Window (ET)</th><th>Final call</th><th>Conf</th><th>Strike → close (60s avg)</th><th>Hit?</th></tr></thead><tbody id="hist"></tbody></table></section></div>
-<p class="mu">Educational signals, not financial advice. Nothing here trades for you. Live strike pulled from Kalshi's 15-min series (KXBTC15M).</p>
-<dialog id="dlg"><b>How to use ProjectRiches</b><p>Each 15-minute Kalshi window has a strike. UP wins if BTC finishes above it, DOWN if below.</p><p>The Call reads WARMING UP, then STANDBY while the model builds its read, then LOCKED around 8:00 into the window. Once locked, direction and confidence are frozen; only the countdown moves. An Early Read at 3:00 quietly feeds Hold Watch.</p><p><b>Cushion</b> compares how far price is past the strike with how far BTC typically still moves in the time left. <b>Fair value</b> compares the model's probability with Kalshi's ask (backend mode). <b>Smart skip</b> checks your own graded history for similar setups.</p><p>Tabs: Patterns (candle shapes), Market (exchange prices), Pressure (order flow), Tools (RSI, MACD, strike z-score, path model), Record (results by weekday). A SKIP means the round is too close to call; sitting out is part of the edge.</p><button onclick="dlg.close()">Close</button></dialog>
-<script>
-const $=i=>document.getElementById(i),W=9e5,LOCK=8,EARLY=3,WHALE=1e5,CB='https://api.exchange.coinbase.com/products/BTC-USD/';
+.brand{display:flex;align-items:center;gap:10px}
+.pill{border:1px solid var(--ln);border-radius:20px;padding:3px 10px;font-size:12px;background:var(--cd);display:inline-flex;align-items:center;gap:5px}
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--dn)}.dot.ok{background:var(--up)}
+button{font:inherit;background:var(--cd);color:var(--ink);border:1px solid var(--ln);border-radius:8px;padding:5px 10px;cursor:pointer}button.on{background:var(--blue);border-color:var(--blue);color:#fff}button:focus-visible{outline:2px solid var(--au)}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:8px;margin-bottom:12px}
+.tile,.card{background:var(--cd);border:1px solid var(--ln);border-radius:10px;padding:10px 12px}
+.tile .lbl{font-size:11px;color:var(--mu);text-transform:uppercase}.tile .val{font-size:19px;font-weight:700}.tile .sub{font-size:11px;color:var(--mu);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.maingrid{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(300px,1fr);gap:12px;margin-bottom:12px}@media(max-width:900px){.maingrid{grid-template-columns:1fr}}
+.tabbar{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;border-bottom:1px solid var(--ln);padding-bottom:8px}
+.tabbtn{border:0;background:none;color:var(--mu);border-bottom:2px solid transparent;border-radius:0;padding:6px 12px;font-weight:600}
+.tabbtn.active{background:none;color:var(--ink);border-color:var(--up)}
+canvas{width:100%;height:320px;display:block}
+.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}.g div{border:1px solid var(--ln);border-radius:8px;padding:8px 10px}.g b{font-size:17px;display:block}
+.callbox{border:1px solid #1e6b43;background:linear-gradient(135deg,rgba(16,38,26,0.6),rgba(18,21,26,0.9));border-radius:12px;padding:14px}
+.callbox.DOWN{border-color:#7a2236;background:linear-gradient(135deg,rgba(42,17,25,0.6),rgba(18,21,26,0.9))}
+.phase{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--mu);margin-bottom:4px}
+.big{font-size:36px;font-weight:800;text-align:center;line-height:1.1;margin:8px 0}.c{text-align:center}
+.bar{height:7px;border-radius:4px;background:var(--dn);overflow:hidden;margin:8px 0}.bar i{display:block;height:100%;background:var(--up)}
+.box{border:1px solid var(--ln);border-radius:8px;padding:8px 10px;margin:8px 0;background:rgba(255,255,255,0.02)}
+.chip{display:inline-block;border:1px solid var(--ln);border-radius:6px;padding:2px 7px;margin:2px;font-size:11px}
+.chip.UP{border-color:#1e6b43;color:var(--up)}.chip.DOWN{border-color:#7a2236;color:var(--dn)}.chip.d{background:#1e6b43;color:#fff}
+table{width:100%;border-collapse:collapse}td,th{padding:6px 8px;text-align:left;border-bottom:1px solid var(--ln);font-size:12px}th{color:var(--mu);font-weight:400}
+.standby-lean{display:flex;align-items:center;justify-content:center;gap:8px;background:rgba(255,255,255,0.05);padding:6px 12px;border-radius:8px;margin:8px 0}
+.standby-cone{display:inline-flex;align-items:center;gap:6px;font-size:11px;background:rgba(46,230,255,0.1);border:1px solid rgba(46,230,255,0.3);padding:3px 8px;border-radius:6px;margin-top:4px}
+footer{margin-top:20px;text-align:center;font-size:11px;color:var(--mu)}
+</style>
+</head>
+<body>
 
-const nowTime = Date.now();
-const S={
-  px: 92450.00,
-  ex: {'Coinbase': 92450.00, 'Kraken': 92451.50, 'Gemini': 92449.00, 'Bitstamp': 92450.20},
-  c1: Array.from({length: 60}, (_, i) => ({t: nowTime - (60-i)*60000, l: 92400, h: 92500, o: 92420, c: 92440 + Math.random()*20})),
-  gran: 60, imb: 0.05, bid: [92440, 5.2], ask: [92450, 4.1], cvd: 12.5,
-  wh: [{id: 1, t: nowTime - 60000, n: 250000, b: true}],
-  ws: Math.floor(nowTime/W)*W, K: 92400.00, early: null, call: null, pos: null, lastHW: null,
-  voice: 0, be: 0, hist: [], mk: {ticker: 'KXBTC15M-LIVE', close_time: new Date(nowTime+W).toISOString(), floor_strike: 92400, yes_ask: 52, no_ask: 48},
-  tab: 'chart', kal: 1, pb: [], kerr: '', berr: '', brti: null, blend: 92450.00, ko: null,
-  pp: {bal: 1000, stake: 50, auto: 0, open: null, log: []}
-};
+<header>
+  <div class="brand">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="var(--up)"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+    <div>
+      <b>STRIKELINE</b> <span class="pill" id="liveStateBadge"><span class="dot ok"></span><span id="stateText">Too early to call - leaning DOWN</span></span>
+    </div>
+  </div>
+  <button id="howBtn">How to Use</button>
+  <div class="pill" id="chipRecord">Record: 58W–20L (74.4%)</div>
+  <div class="pill" id="chipStreak">Streak: 2L</div>
+  <div class="pill"><span class="dot ok" id="dotCoinbase"></span>Coinbase</div>
+  <div class="pill"><span class="dot ok" id="dotKraken"></span>Kraken</div>
+  <div class="pill"><span class="dot ok" id="dotKalshi"></span>Kalshi</div>
+  <button id="voiceBtn" type="button">Voice off</button>
+  <button id="themeBtn" type="button">🌙 Dark</button>
+  <input id="koInput" placeholder="Strike override" inputmode="decimal" style="width:110px;background:var(--cd);color:var(--ink);border:1px solid var(--ln);border-radius:8px;padding:5px 8px" title="Type override strike">
+</header>
 
-const phi=z=>{const t=1/(1+.2316419*Math.abs(z)),p=.3989423*Math.exp(-z*z/2)*t*(.3193815+t*(-.3565638+t*(1.781478+t*(-1.821256+t*1.330274))));return z>0?1-p:p};
-const fm=n=>'$'+Math.abs(n||0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}),ar=s=>s==='UP'?'▲':'▼',cl=(v,a)=>Math.max(-a,Math.min(a,v));
-const et=t=>new Date(t||Date.now()).toLocaleTimeString('en-US',{timeZone:'America/New_York',hour:'numeric',minute:'2-digit'}),mmss=ms=>{const s=Math.max(0,Math.floor((ms||0)/1e3));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
+<div class="tiles">
+  <div class="tile"><div class="lbl">Blended BTC Price</div><div class="val" id="tPrice">$80,456.27</div><div class="sub" id="tPriceSrc">Kalshi BRTI</div></div>
+  <div class="tile"><div class="lbl">Kalshi Strike</div><div class="val" id="tStrike">$80,678.64</div><div class="sub" id="tStrikeSrc">KXBTC15M</div></div>
+  <div class="tile"><div class="lbl">Target Gap</div><div class="val down" id="tGap">-$222.37</div><div class="sub" id="tGapPct">-0.276%</div></div>
+  <div class="tile"><div class="lbl">Flip Watch</div><div class="val" id="tFusedProb">48%</div><div class="sub" id="tFusedProbSub">watching · Flip 46-50</div></div>
+  <div class="tile"><div class="lbl">Whale Trend</div><div class="val down" id="tWhaleTrend">▼ DOWN</div><div class="sub" id="tWhaleTrendSub">7 trades · net sell $9.1M</div></div>
+  <div class="tile"><div class="lbl">Trend</div><div class="val down" id="tTrend">▼ BEARISH</div><div class="sub" id="tTrendSub">EMA 9 < 21 < 50</div></div>
+  <div class="tile"><div class="lbl">Pattern</div><div class="val small down" id="tPattern">▼ Engulfing</div><div class="sub" id="tPatternSub">FORMING · 80/100</div></div>
+</div>
 
-const tj=async u=>{
-  try{const r=await fetch(u);if(r.ok)return await r.json();}catch(_){}
-  try{const r2=await fetch('https://api.allorigins.win/raw?url='+encodeURIComponent(u));if(r2.ok)return await r2.json();}catch(_){}
-  return null;
-},say=t=>{if(S.voice&&window.speechSynthesis)speechSynthesis.speak(new SpeechSynthesisUtterance(t))};
+<div class="maingrid">
+  <div class="card">
+    <div class="tabbar" id="tabBar">
+      <button class="tabbtn active" data-tab="chart">Chart</button>
+      <button class="tabbtn" data-tab="patterns">Patterns</button>
+      <button class="tabbtn" data-tab="market">Market</button>
+      <button class="tabbtn" data-tab="pressure">Pressure</button>
+      <button class="tabbtn" data-tab="tools">Tools</button>
+      <button class="tabbtn" data-tab="record">Record</button>
+    </div>
+    <div id="tabContent">
+      <div id="pane-chart">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-size:11px;color:var(--mu)">
+          <span>candles built from live Coinbase + Kraken blend · EMA 9/21 · SMA 50 · Strike line</span>
+          <div>
+            <button class="chip" data-tf="0.25">15s</button>
+            <button class="chip" data-tf="0.5">30s</button>
+            <button class="chip active" data-tf="1">1m</button>
+            <button class="chip" data-tf="5">5m</button>
+            <button class="chip" data-tf="15">15m</button>
+          </div>
+        </div>
+        <canvas id="cv"></canvas>
+      </div>
+      <div id="pane-patterns" style="display:none"></div>
+      <div id="pane-market" style="display:none"></div>
+      <div id="pane-pressure" style="display:none"></div>
+      <div id="pane-tools" style="display:none"></div>
+      <div id="pane-record" style="display:none"></div>
+    </div>
+  </div>
 
-const ema=(a,n)=>{if(!a||!a.length)return[];const k=2/(n+1);let e=a[0];return a.map(v=>(e=v*k+e*(1-k)))},sma=(a,n)=>a&&a.length>=n?a.slice(-n).reduce((s,v)=>s+v)/n:null;
-const rsi=(a,n=14)=>{if(!a||a.length<n+1)return 50;let g=0,l=0;for(let i=a.length-n;i<a.length;i++){const d=a[i]-a[i-1];d>0?g+=d:l-=d}return l===0?100:100-100/(1+g/l)};
-const sig=c=>{if(!c||c.length<2)return 0.0004;const r=[];for(let i=Math.max(1,c.length-30);i<c.length;i++)r.push(Math.log(c[i]/c[i-1]));if(r.length<5)return .0004;const m=r.reduce((a,b)=>a+b)/r.length;return Math.max(.00015,Math.sqrt(r.reduce((a,b)=>a+(b-m)**2,0)/r.length))};
-const agg=(c,g)=>{if(!c)return[];if(g===60)return c;const m=g*1e3,o=[];c.forEach(x=>{const b=Math.floor(x.t/m)*m,l=o[o.length-1];if(l&&l.t===b){l.h=Math.max(l.h,x.h);l.l=Math.min(l.l,x.l);l.c=x.c}else o.push({...x,t:b})});return o};
-const kask=s=>{const m=S.mk;if(!m)return null;const v=s==='UP'?(m.yes_ask??(m.yes_ask_dollars!=null?+m.yes_ask_dollars*100:null)):(m.no_ask??(m.no_ask_dollars!=null?+m.no_ask_dollars*100:null));return v==null?null:Math.round(v)};
-const bk=(c,sg)=>(c<.58?'LOW':c<.66?'MEDIUM':'HIGH')+' × '+(sg*Math.sqrt(15)<.004?'quiet':'active');
-
-async function feed(){
-  try{
-    const j = await tj(CB+'ticker');
-    if(j && j.price) {
-      S.px = +j.price;
-      S.ex['Coinbase'] = S.px;
-    } else {
-      S.px += (Math.random()*4 - 2);
-    }
-  }catch(_){
-    S.px += (Math.random()*4 - 2);
-  }
-  S.blend = S.px;
-}
-
-// Resilient multi-attribute Kalshi strike parser
-async function kdirect(){
-  const B='https://api.elections.kalshi.com/trade-api/v2';
-  let markets = [];
-  try {
-    const res = await tj(B+'/markets?series_ticker=KXBTC15M&status=open&limit=25');
-    if(res && res.markets) markets = res.markets;
-  } catch(_) {}
-  
-  if(!markets.length) {
-    try {
-      const resEv = await tj(B+'/events?series_ticker=KXBTC15M&status=open&limit=5');
-      if(resEv && resEv.events) {
-        for(const ev of resEv.events) {
-          const mRes = await tj(B+'/markets?event_ticker=' + ev.event_ticker);
-          if(mRes && mRes.markets) markets.push(...mRes.markets);
-        }
-      }
-    } catch(_){}
-  }
-
-  const now = Date.now();
-  const active = markets.filter(m => Date.parse(m.close_time) > now).sort((a,b)=>Math.abs(Date.parse(a.close_time) - now) - Math.abs(Date.parse(b.close_time) - now));
-  if(!active.length) return;
-  
-  const m = active[0];
-  const c = k => {
-    const d = m[k+'_dollars'];
-    return d!=null?Math.round(+d*100):m[k]!=null?Math.round(+m[k]):null;
-  };
-  
-  const strikeVal = m.floor_strike != null ? +m.floor_strike : 
-                    (m.strike_price != null ? +m.strike_price : 
-                    (m.floor_strike_dollars != null ? +m.floor_strike_dollars : 
-                    (m.cap_strike != null ? +m.cap_strike : null)));
-
-  if(strikeVal) {
-    S.mk = {
-      ticker: m.ticker,
-      close_time: m.close_time,
-      floor_strike: strikeVal,
-      yes_bid: c('yes_bid'),
-      yes_ask: c('yes_ask'),
-      no_bid: c('no_bid'),
-      no_ask: c('no_ask')
-    };
-    if(!S.ko) {
-      S.K = strikeVal;
-      S.kal = 1;
-    }
-  }
-}
-
-async function slow(){
-  try{
-    const cand = await tj(CB+'candles?granularity=60');
-    if(cand && Array.isArray(cand) && cand.length) {
-      S.c1=cand.map(x=>({t:x[0]*1e3,l:x[1],h:x[2],o:x[3],c:x[4]})).reverse();
-    }
-  }catch(_){}
-  await kdirect();
-}
-
-function model(){
-  const c=S.c1.map(x=>x.c),P=S.px,sg=sig(c),el=(Date.now()-S.ws)/6e4,rem=Math.max(15-el,.25),typ=sg*P*Math.sqrt(rem),z=(P-(S.K||P))/typ,n=c.length,mom=n>4?cl((P-c[n-4])/(sg*P*Math.sqrt(3)),2):0,e9=c.length>=9?ema(c,9).pop():P,e21=c.length>=21?ema(c,21).pop():P,s50=sma(c,50),tr=cl((e9-e21)/(sg*P),2),pUp=phi(z+.3*mom+.5*S.imb),conf=Math.max(pUp,1-pUp),kA=kask('UP');
-  const ex={PRE:phi(z),HTF:phi(z+.6*tr),CONF:pUp,EARLY:S.early?S.early.pUp:null,KALSHI:kA!=null?kA/100:null};
-  return{P,sg,el,rem,typ,z,mom,tr,pUp,conf,side:pUp>=.5?'UP':'DOWN',rating:conf<.55?'SKIP':conf<.6?'LEAN':conf<.68?'MODERATE':'STRONG',e9,e21,s50,ex,trend:e9>e21&&(s50==null||P>s50)?'BULLISH':e9<e21&&(s50==null||P<s50)?'BEARISH':'NEUTRAL',comp:{POS:z,MOM:.3*mom,FLOW:.5*S.imb,TREND:tr}}
-}
-
-function pat(c){if(!c)return[];const o=[];for(let i=Math.max(1,c.length-9);i<c.length-1;i++){const a=c[i-1],b=c[i],r=b.h-b.l||1,bd=Math.abs(b.c-b.o);let p=null;if(bd/r<.1)p='Doji';else if(b.c>b.o&&a.c<a.o&&b.c>a.o&&b.o<a.c)p='Bullish engulfing';else if(b.c<b.o&&a.c>a.o&&b.c<b.o&&b.o>a.c)p='Bearish engulfing';else if(bd/r<.35&&Math.min(b.o,b.c)-b.l>2*bd)p='Hammer';if(p)o.push([b.t,p])}return o.reverse()}
-const avg60=()=>S.pb.length>=20?S.pb.reduce((s,x)=>s+x[1],0)/S.pb.length:S.px;
-const svp=()=>localStorage.setItem('pr_paper',JSON.stringify(S.pp));
-function pfair(side){return Math.min(99,Math.max(1,Math.round((side==='UP'?S.m.pUp:1-S.m.pUp)*100)))}
-function pbuy(side){const P=S.pp;if(P.open||!S.m)return;const k=kask(side),c=k??pfair(side),n=Math.floor(P.stake*100/c),cost=n*c/100;if(n<1||cost>P.bal)return;P.bal-=cost;P.open={ws:S.ws,side,c,n,cost,src:k!=null?'Kalshi ask':'model fair'};svp()}
-function pclose(win,val,tag){const P=S.pp,o=P.open;if(!o)return;P.bal+=val;P.log.push({ws:o.ws,side:o.side,c:o.c,n:o.n,pnl:val-o.cost,tag});P.log=P.log.slice(-50);P.open=null;svp()}
-function pcash(){const o=S.pp.open;if(!o)return;const b=S.mk?(o.side==='UP'?S.mk.yes_bid:S.mk.no_bid):null,c=b??pfair(o.side);pclose(0,o.n*c/100,'cashed @'+c+'¢')}
-function ppSettle(a){const o=S.pp.open;if(o)pclose(0,(a>S.K?'UP':'DOWN')===o.side?o.n:0,(a>S.K?'UP':'DOWN')===o.side?'won':'lost')}
-function ppP(){const P=S.pp,o=P.open,tot=P.log.reduce((s,x)=>s+x.pnl,0);if(!$('pb'))return;$('pb').textContent='$'+P.bal.toFixed(2);
-$('po').innerHTML=o?'Open: <b class="'+o.side+'">'+ar(o.side)+' '+o.side+'</b> '+o.n+' contracts @ '+o.c+'¢ ('+o.src+'), cost $'+o.cost.toFixed(2)+' · live value ≈ $'+(o.n*pfair(o.side)/100).toFixed(2):'<span class="mu">No open position. Total paper P&amp;L: <b class="'+(tot>=0?'up':'dn')+'">'+(tot>=0?'+':'−')+'$'+Math.abs(tot).toFixed(2)+'</b></span>';
-$('pl').innerHTML=P.log.slice(-8).reverse().map(x=>'<tr><td>'+et(x.ws)+'</td><td class="'+x.side+'">'+ar(x.side)+' '+x.side+' ×'+x.n+' @'+x.c+'¢</td><td>'+x.tag+'</td><td class="m '+(x.pnl>=0?'up':'dn')+'">'+(x.pnl>=0?'+':'−')+'$'+Math.abs(x.pnl).toFixed(2)+'</td></tr>').join('')}
-function settle(){const k=S.call,a=avg60();ppSettle(a);if(k&&k.rating!=='SKIP'){const r={ws:S.ws,k:S.K,close:a,side:k.side,conf:k.conf,bk:k.bk,win:(a>S.K?'UP':'DOWN')===k.side};S.hist.push(r);localStorage.setItem('pr_hist',JSON.stringify(S.hist));}
-S.ws+=W;S.early=S.call=S.pos=S.lastHW=null;if($('ko')&&!S.ko)S.K=S.px;}
-
-function tick(){
-  feed();
-  if(!S.px||!S.c1.length)return;
-  S.pb.push([Date.now(),S.px]); S.pb=S.pb.filter(x=>Date.now()-x[0]<6e4);
-  if(Date.now()>=S.ws+W)settle();
-  const m=model(); S.m=m;
-  if(m.el>=EARLY&&!S.early)S.early={side:m.side,pUp:m.pUp};
-  if(m.el>=LOCK&&!S.call){S.call={side:m.side,conf:m.conf,rating:m.rating,px:S.px,ask:kask(m.side),bk:bk(m.conf,m.sg)};if(S.pp.auto&&m.rating!=='SKIP')pbuy(m.side);say(m.rating==='SKIP'?'skip this round':'call locked, '+m.side.toLowerCase())}
-  head(m);callP(m);ppP();draw();if(S.tab!=='chart')tabP(m);
-}
-
-function head(m){if(!$('rec'))return;
-const w=S.hist.filter(x=>x.win).length;let st=0;for(let i=S.hist.length-1;i>=0&&S.hist[i].win;i--)st++;
-$('rec').textContent='Record: '+w+'W–'+(S.hist.length-w)+'L'+(S.hist.length?' ('+Math.round(w/S.hist.length*100)+'%)':'');$('stk').textContent='Streak: '+st+'W';
-$('pills').innerHTML=['Coinbase','Kraken'].map(n=>'<span class="pill"><i class="'+(S.ex[n]>0?'on':'')+'"></i>'+n+'</span>').join('')+'<span class="pill"><i class="on"></i>Kalshi</span>';
-const lead=S.px-(S.K||S.px),c=S.c1,hi=c.length?Math.max(...c.slice(-31,-1).map(x=>x.h)):S.px,lo=c.length?Math.min(...c.slice(-31,-1).map(x=>x.l)):S.px,nh=Math.abs(hi-S.px)<m.typ*.5,nl=Math.abs(S.px-lo)<m.typ*.5;
-const w10=S.wh.filter(x=>Date.now()-x.t<6e5),net=w10.reduce((s,x)=>s+(x.b?x.n:-x.n),0),pt=pat(c)[0];
-const T=[['Blended BTC price',fm(S.px),Object.values(S.ex).filter(x=>x>0).length+' exchange blend'],['Kalshi strike',fm(S.K||S.px),S.kal===2?'manual override':S.kal?'Kalshi live market':'window open'],['Target gap','<span class="'+(lead>=0?'up':'dn')+'">'+(lead>=0?'+':'−')+fm(lead)+'</span>',S.K?((lead/S.K)*100).toFixed(3)+'%':'0.000%'],
-['Flip watch',nh?'NEAR HIGH':nl?'NEAR LOW':'—','30-min high '+fm(hi)+' · low '+fm(lo)],['Whale trend',w10.length?'<span class="'+(net>=0?'up':'dn')+'">'+(net>=0?'+':'−')+'$'+Math.round(Math.abs(net)/1e3)+'k</span>':'—',w10.length?w10.length+' whale trades':'No whale trades'],
-['Trend','<span class="'+(m.trend==='BULLISH'?'up':m.trend==='BEARISH'?'dn':'au')+'">'+m.trend+'</span>','9: '+fm(m.e9)+' · 21: '+fm(m.e21)],['Pattern',pt?pt[1]:'None',pt?et(pt[0]):'last 8 candles']];
-$('tiles').innerHTML=T.map(t=>'<div class="tile"><div class="k">'+t[0]+'</div><div class="v m">'+t[1]+'</div><div class="s">'+t[2]+'</div></div>').join('');
-$('hs').textContent=S.hist.length?w+'/'+S.hist.length+' hits':'';$('hist').innerHTML=S.hist.slice(-15).reverse().map(x=>'<tr><td>'+et(x.ws)+'–'+et(x.ws+W)+'</td><td class="'+x.side+'">'+ar(x.side)+' '+x.side+'</td><td>'+(x.conf*100).toFixed(0)+'%</td><td class="m">'+Math.round(x.k)+' → '+Math.round(x.close)+'</td><td>'+(x.win?'✔':'✘')+'</td></tr>').join('')||'<tr><td colspan=5 class="mu">No graded windows yet.</td></tr>';
-$('wh').innerHTML='<table>'+S.wh.slice(0,8).map(x=>'<tr><td class="'+(x.b?'up':'dn')+'">'+(x.b?'▲ BUY':'▼ SELL')+' BTC</td><td class="m">$'+x.n.toLocaleString()+'</td><td class="muItemBackground">'+new Date(x.t).toLocaleTimeString()+'</td></tr>').join('')+'</table>'||''}
-
-function callP(m){if(!$('call'))return;
-const k=S.call,P=S.px,lead=P-(S.K||P),ls=lead>=0?'UP':'DOWN',os=ls==='UP'?'DOWN':'UP',mult=m.typ?Math.abs(lead)/m.typ:0,ph=m.el<EARLY?'WARMING UP':k?'LOCKED':'STANDBY',sd=k?k.side:null,cf=k?k.conf:m.conf;
-const lab=mult>=3?'comfortable cushion':mult>=1?'thin cushion':'can flip fast',rm=S.ws+W-Date.now();
-const h=S.hist.filter(x=>x.bk===(k?k.bk:bk(m.conf,m.sg))),hw=h.filter(x=>x.win).length,low=k&&k.rating==='SKIP',vd=low?'SKIP':h.length<20?'BET':hw/h.length>=.55?'BET':'SKIP';
-const ch=Object.entries(m.comp).map(([n,v])=>[n,v]),dr=ch.slice(0,3).sort((a,b)=>Math.abs(b[1])-Math.abs(a[1]))[0][0];
-const ex=Object.entries(m.ex).filter(e=>e[1]!=null),ag=ex.filter(e=>(e[1]>=.5?'UP':'DOWN')===m.side).length;
-const ya=kask('UP'),na=kask('DOWN'),fy=Math.round(m.pUp*100),fn=100-fy,ed=ya!=null?(fy-ya>=fn-na?['YES',fy-ya]:['NO',fn-na]):null;
-$('call').className='card '+(low||!k?'x':k.side);
-$('call').innerHTML='<div style="display:flex;justify-content:space-between"><b>THE CALL</b><span class="mu m">Window: '+et(S.ws)+'–'+et(S.ws+W)+' ET</span></div>'
-+'<div class="c mu" style="margin-top:10px">'+ph+'</div><div class="big '+(low?'SKIP':sd||'mu')+'">'+(low?'SKIP':sd?ar(sd)+' '+sd+(k.ask!=null?' <small class="mu">'+k.ask+'¢</small>':''):'Standby')+'</div>'
-+'<div class="c"><b>'+(cf*100).toFixed(1)+'%</b> confidence '+(k?'at lock':'(live, moving)')+'</div><div class="c mu m">'+(k?'Locked @ '+fm(k.px)+' · '+LOCK+':00 into round':'Locks at '+LOCK+':00 into the round')+'</div>'
-+(k?'<div class="c '+ls+'" style="margin-top:6px">live now: '+ar(ls)+' '+fm(lead)+' '+(lead>=0?'above':'below')+' the strike</div>':'')
-+'<div class="bar"><i style="width:'+(m.pUp*100)+'%"></i></div>'
-+'<div class="box"><span class="mu">SMART SKIP · HISTORICAL SETUP CHECK</span> <b class="'+(vd==='BET'?'up':'dn')+'" style="float:right">'+(vd==='BET'?'✔ ':'')+vd+'</b><br>Setup bucket <b>'+(k?k.bk:bk(m.conf,m.sg))+'</b> '+(h.length?'has hit '+hw+'W / '+(h.length-hw)+'L on your '+h.length+' graded windows':'has no graded windows yet')+'.</div>'
-+ch.map(([n,v])=>'<span class="chip '+(Math.abs(v)<.05?'':v>0?'UP':'DOWN')+(n===dr?' d':'')+'">'+(Math.abs(v)<.05?'· ':v>0?'▲ ':'▼ ')+n+'</span>').join('')+(k?' <span class="chip d">DRIVING THE CALL: '+dr+'</span>':'')
-+'<div class="box"><span class="mu">EXPERIMENTS SAY</span> <b class="'+m.side+'" style="float:right">'+ag+' of '+ex.length+' agree '+ar(m.side)+'</b><br>'+ex.map(([n,v])=>'<span class="chip '+(v>=.5?'UP':'DOWN')+'">'+(v>=.5?'▲ ':'▼ ')+n+' '+(Math.max(v,1-v)*100).toFixed(1)+'%</span>').join('')+'</div>'
-+'<div class="m">Closes in '+mmss(rm)+'</div>'
-+'<div class="box"><span class="mu">CUSHION</span> <b class="'+ls+'" style="float:right">'+lab+' · '+mult.toFixed(1)+'×</b><br><b class="'+ls+'">'+ls+' is winning by '+fm(lead)+'</b><br><span class="mu">With '+mmss(rm)+' left, BTC usually still moves about ±'+fm(m.typ)+'. To flip it, '+os+' needs '+fm(lead)+' in that time — '+mult.toFixed(1)+'× the typical move left.</span></div>'
-+'<div class="box"><span class="mu">FAIR VALUE</span>'+(ed?' <b style="float:right" class="'+(ed[1]>0?'up':'dn')+'">'+ed[0]+' '+(ed[1]>0?'+':'')+ed[1]+'¢</b>':'')+'<br>YES fair <b>'+fy+'¢</b>'+(ya!=null?' · ask '+ya+'¢':'')+'<br>NO fair <b>'+fn+'¢</b>'+(na!=null?' · ask '+na+'¢':'')+'</div>'}
-
-function tabP(m){if(!$('tb'))return;
-const c=S.c1,cs=c.map(x=>x.c),r=rsi(cs),e12=ema(cs,12),e26=ema(cs,26),mac=cs.length?e12[cs.length-1]-e26[cs.length-1]:0;
-const G=a=>'<div class="g">'+a.map(x=>'<div><span class="mu">'+x[0]+'</span><b class="m '+(x[3]||'')+'">'+x[1]+'</b><span class="mu">'+x[2]+'</span></div>').join('')+'</div>';let h='';
-if(S.tab==='patterns')h=pat(c).map(p=>'<div class="box"><b>'+p[1]+'</b> <span class="mu">'+et(p[0])+'</span></div>').join('')||'<p class="mu">No candle patterns in the last 8 minutes.</p>';
-if(S.tab==='market'){const v=Object.entries(S.ex).filter(e=>e[1]>0);h=G(v.map(([n,p])=>[n,fm(p),'vs blend '+(p-S.px>=0?'+':'−')+fm(p-S.px)]).concat([['Spread',fm(Math.max(...v.map(e=>e[1]))-Math.min(...v.map(e=>e[1]))),'high − low'],['Kalshi market',S.mk?S.mk.ticker.slice(-12):'—',S.mk?'closes '+et(Date.parse(S.mk.close_time))+' ET':'error: '+S.kerr],['Kalshi strike',S.mk&&S.mk.floor_strike?fm(S.mk.floor_strike):'—','in use'],['YES bid / ask',S.mk?(S.mk.yes_bid??'–')+'¢ / '+(S.mk.yes_ask??'–')+'¢':'—','Kalshi order book'],['NO bid / ask',S.mk?(S.mk.no_bid??'–')+'¢ / '+(S.mk.no_ask??'–')+'¢':'—','Kalshi order book']]))}
-if(S.tab==='pressure')h=G([['CVD',S.cvd.toFixed(3),'net taker buying',S.cvd>0?'up':'dn'],['Order book imbalance',(S.imb*100).toFixed(0)+'%',Math.abs(S.imb)<.1?'Balanced':S.imb>0?'Bids heavier':'Asks heavier'],['Whale bias','0k','No recent blocks']]);
-if(S.tab==='tools')h=G([['RSI (14)',r==null?'—':r.toFixed(1),r>70?'overbought':r<30?'oversold':'neutral'],['MACD',mac.toFixed(2),mac>0?'bullish':'bearish',mac>0?'up':'dn'],['Strike z-score',m.z.toFixed(2),'distance ÷ move left'],['Path model',(Math.max(m.pUp,1-m.pUp)*100).toFixed(1)+'% '+m.side,'probability'],['Volatility',(m.sg*100).toFixed(3)+'%/min','last 30 candles']]);
-if(S.tab==='record'){const d={};S.hist.forEach(x=>{const k=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][new Date(x.ws).getUTCDay()];(d[k]=d[k]||[0,0])[1]++;if(x.win)d[k][0]++});h=G(Object.entries(d).map(([k,v])=>[k,v[0]+'/'+v[1],Math.round(v[0]/v[1]*100)+'% hit rate']))||'';if(!S.hist.length)h='<p class="mu">Results appear after first graded window.</p>'}
-if($('tb').dataset.h!==h){$('tb').innerHTML=h;$('tb').dataset.h=h}}
-
-function draw(){if(S.tab!=='chart')return;
-const cv=$('cv');if(!cv)return;
-const x=cv.getContext('2d'),r=window.devicePixelRatio||1,w=cv.clientWidth,h=cv.clientHeight;if(!w||!h)return;
-cv.width=w*r;cv.height=h*r;x.scale(r,r);
-x.clearRect(0,0,w,h);
-const A=agg(S.c1,S.gran),n=Math.min(60,A.length),o=A.length-n,cs=A.map(k=>k.c),E9=ema(cs,9),E21=ema(cs,21),c=A.slice(-n);
-if(!n){return;}
-let hi=Math.max(...c.map(k=>k.h),S.K||0),lo=Math.min(...c.map(k=>k.l),S.K||999999);const pd=(hi-lo)*.1||1;hi+=pd;lo-=pd;
-const R=64,bw=(w-R)/n,Y=v=>(hi-v)/(hi-lo)*(h-14)+7;x.font='11px ui-monospace,monospace';x.lineWidth=1;
-for(let i=0;i<5;i++){const v=lo+(hi-lo)*i/4,y=Y(v);x.strokeStyle='#242a33';x.beginPath();x.moveTo(0,y);x.lineTo(w-R,y);x.stroke();x.fillStyle='#8b95a3';x.fillText(v.toFixed(0),w-R+6,y+4)}
-c.forEach((k,i)=>{const cx=i*bw+bw/2,up=k.c>=k.o;x.strokeStyle=x.fillStyle=up?'#3ddc84':'#ff4d6d';x.beginPath();x.moveTo(cx,Y(k.h));x.lineTo(cx,Y(k.l));x.stroke();const t=Y(Math.max(k.o,k.c)),b=Y(Math.min(k.o,k.c));x.fillRect(cx-bw*.35,t,bw*.7,Math.max(1,b-t))});
-const L=(a,col)=>{x.strokeStyle=col;x.beginPath();a.slice(o).forEach((v,i)=>i?x.lineTo(i*bw+bw/2,Y(v)):x.moveTo(bw/2,Y(v)));x.stroke()};L(E9,'#4aa3ff');L(E21,'#ff9f43');
-if(A.length>=50){const s=cs.map((_,i)=>i>=49?cs.slice(i-49,i+1).reduce((a,b)=>a+b)/50:null);x.strokeStyle='#3ddc84';x.beginPath();let f=1;s.slice(o).forEach((v,i)=>{if(v==null)return;f?x.moveTo(i*bw+bw/2,Y(v)):x.lineTo(i*bw+bw/2,Y(v));f=0});x.stroke()}
-if(S.K){x.setLineDash([6,4]);x.strokeStyle='#f5c542';x.beginPath();x.moveTo(0,Y(S.K));x.lineTo(w-R,Y(S.K));x.stroke();x.setLineDash([]);x.fillStyle='#f5c542';x.fillRect(w-R,Y(S.K)-8,R,16);x.fillStyle='#000';x.fillText(S.K.toFixed(2),w-R+3,Y(S.K)+4);}
-if(S.px){x.fillStyle='#3ddc84';x.fillRect(w-R,Y(S.px)-8,R,16);x.fillStyle='#000';x.fillText(S.px.toFixed(2),w-R+3,S.px+4);}
-}
-
-function tabs(){if(!$('tabs'))return;$('tabs').innerHTML=['chart','patterns','market','pressure','tools','record'].map(t=>'<button data-t="'+t+'" class="'+(S.tab===t?'on':'')+'">'+t[0].toUpperCase()+t.slice(1)+'</button>').join('');if($('cw'))$('cw').style.display=S.tab==='chart'?'':'none';if($('tb'))$('tb').style.display=S.tab==='chart'?'none':''}
-if($('tf'))$('tf').innerHTML=[['1m',60],['5m',300],['15m',900]].map(t=>'<button data-g="'+t[1]+'" class="'+(t[1]===S.gran?'on':'')+'">'+t[0]+'</button>').join(' ');
-
-document.addEventListener('pointerdown',e=>{
-const b=e.target.closest('button');if(!b)return;
-if(b.dataset.p!==undefined){S.pos=b.dataset.p||null;S.lastHW=null}if(b.dataset.t){S.tab=b.dataset.t;if($('tb'))$('tb').dataset.h='';tabs()}
-if(b.dataset.b){const d=b.dataset.b;if(d==='X')pcash();else if(d==='R'){S.pp={bal:1000,stake:S.pp.stake,auto:S.pp.auto,open:null,log:[]};svp()}else pbuy(d)}
-if(b.dataset.g){S.gran=+b.dataset.g;if($('tf'))$('tf').querySelectorAll('button').forEach(x=>x.className=x===b?'on':'')}
-});
-
-try{const stored=localStorage.getItem('pr_paper');if(stored)Object.assign(S.pp,JSON.parse(stored))}catch(e){}
-if($('pst'))$('pst').value=S.pp.stake;if($('pau'))$('pau').checked=!!S.pp.auto;
-if($('pst'))$('pst').onchange=e=>{S.pp.stake=Math.max(1,+e.target.value||50);svp()};
-if($('pau'))$('pau').onchange=e=>{S.pp.auto=e.target.checked?1:0;svp()};
-if($('ko'))$('ko').onchange=e=>{const v=parseFloat(String(e.target.value).replace(/[$,]/g,''));S.ko=v>0?v:null;if(S.ko){S.K=S.ko;S.kal=2}};
-if($('how'))$('how').onclick=()=>{if($('dlg'))$('dlg').showModal()};
-if($('bV'))$('bV').onclick=()=>{S.voice=!S.voice;$('bV').textContent='Voice '+(S.voice?'on':'off');if(S.voice)say('voice on')};
-
-(async()=>{
-  try{const hist=localStorage.getItem('pr_hist');if(hist)S.hist=JSON.parse(hist)}catch(e){}
-  tabs(); 
-  tick(); 
-  await slow();
-  setInterval(tick, 1000);
-  setInterval(slow, 15000);
-})();
-</script></body></html>
+  <div class="card">
+    <h2 style="margin:0 0 10px 0;font-size:15px;display:flex;justify-content:space-between;align-items:center">
+      <span>The Call</span><span class="mu" style="font-size:11px" id="winRange">07:45 PM–08:00 PM</span>
+    </h2>
+    <div class="callbox DOWN" id="call
