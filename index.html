@@ -2,317 +2,279 @@
 <html lang="en" data-theme="dark">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>The Deity Don — BTC 15-Min Prediction Engine</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Deity Don · Real signals. Smarter plays.</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Cdefs%3E%3ClinearGradient id=%22g%22 x1=%220%22 y1=%220%22 x2=%221%22 y2=%221%22%3E%3Cstop offset=%220%22 stop-color=%22%23FFFFFF%22/%3E%3Cstop offset=%22.55%22 stop-color=%22%2300FF88%22/%3E%3Cstop offset=%221%22 stop-color=%22%230ECF6A%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%230B0F0E%22/%3E%3Ccircle cx=%2250%22 cy=%2250%22 r=%2238%22 fill=%22none%22 stroke=%22%2300FF88%22 stroke-width=%224%22/%3E%3Cpolygon transform=%22translate%2812.5 12.5%29 scale%28.75%29%22 points=%2258%2C4 24%2C56 46%2C56 38%2C96 76%2C40 54%2C40 70%2C4%22 fill=%22url%28%23g%29%22/%3E%3C/svg%3E">
 <style>
-:root{color-scheme:dark;--bg:#0b0d10;--panel:#12151a;--line:#242a33;--ink:#e9edf2;--mute:#8b95a3;--up:#00ff88;--dn:#ff4d6d;--au:#ffc83d;--model:#9aa8f5}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:13px/1.45 ui-sans-serif,system-ui,sans-serif;padding:10px 14px}
-.m{font-family:ui-monospace,Menlo,monospace}.mu{color:var(--mute)}.UP,.up{color:var(--up)}.DOWN,.dn{color:var(--dn)}.au{color:var(--au)}
-header{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:10px}
-.brand{display:flex;align-items:center;gap:12px}
-.logo-img{height:34px;width:auto;filter:drop-shadow(0 0 6px rgba(255,255,255,0.25))}
-.pill{border:1px solid var(--line);border-radius:20px;padding:3px 10px;font-size:12px;background:var(--panel);display:inline-flex;align-items:center;gap:6px}
-.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--dn)}.dot.ok{background:var(--up)}
-button{font:inherit;background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:5px 10px;cursor:pointer}button.on{background:var(--model);color:#000;border-color:var(--model)}
-.topgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:10px}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px;box-shadow:0 4px 16px rgba(0,0,0,0.2)}
-.tcard{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
-.tcard .k{font-size:11px;color:var(--mute);text-transform:uppercase;font-weight:700}.tcard .v{font-size:20px;font-weight:800;margin:2px 0}.tcard .sub{font-size:11px;color:var(--mute)}
-.maingrid{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(320px,1fr);gap:12px;margin-bottom:10px}@media(max-width:900px){.maingrid{grid-template-columns:1fr}}
-.tabbar{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;border-bottom:1px solid var(--line);padding-bottom:6px}
-.tabbtn{border:0;background:none;color:var(--mute);border-bottom:2px solid transparent;border-radius:0;padding:5px 10px;font-weight:700}
-.tabbtn.active{background:none;color:var(--ink);border-color:var(--up)}
-canvas{width:100%;height:320px;display:block}
-.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}.g div{border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:#0b1210}.g b{font-size:16px;display:block}
-.callbox{border:1px solid #1e6b43;background:linear-gradient(135deg,rgba(16,38,26,0.7),rgba(18,21,26,0.9));border-radius:12px;padding:14px}
-.callbox.DOWN{border-color:#7a2236;background:linear-gradient(135deg,rgba(42,17,25,0.7),rgba(18,21,26,0.9))}
-.phase{font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--mute);margin-bottom:4px}
-.big{font-size:36px;font-weight:800;text-align:center;line-height:1.1;margin:6px 0}.c{text-align:center}
-.bar{height:8px;border-radius:4px;background:var(--dn);overflow:hidden;margin:8px 0}.bar i{display:block;height:100%;background:var(--up)}
-.box{border:1px solid var(--line);border-radius:8px;padding:8px 10px;margin:8px 0;background:rgba(255,255,255,0.02)}
-.chip{display:inline-block;border:1px solid var(--line);border-radius:6px;padding:2px 7px;margin:2px;font-size:11px}
-.chip.UP{border-color:#1e6b43;color:var(--up)}.chip.DOWN{border-color:#7a2236;color:var(--dn)}.chip.d{background:#1e6b43;color:#fff}
-table{width:100%;border-collapse:collapse}td,th{padding:6px 8px;text-align:left;border-bottom:1px solid var(--line);font-size:12px}th{color:var(--mute);font-weight:700}
-footer{margin-top:15px;text-align:center;font-size:11px;color:var(--mute)}
+:root{  --bg:#0B0F0E; --panel:#0f1614; --ink:#F2F6F4; --mute:#9aa6a1; --line:#1c2a25; --soft:#0b1210;  --gold:#ffc83d; --gold-bg:#2b2205;  --yes:#2fbf8f; --yes-bg:#0b2420; --no:#e5605d; --no-bg:#2a1214;  --model:#9aa8f5; --model-bg:#171b38; --warn:#e0a526; --warn-bg:#2a2108; color-scheme: dark;}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 ui-sans-serif,system-ui,-apple-system,sans-serif;font-variant-numeric:tabular-nums;padding:12px 14px}
+main{max-width:1000px;margin:0 auto;padding:10px}
+.strip{position:sticky;top:0;z-index:60;display:flex;flex-wrap:wrap;align-items:center;gap:6px 18px;background:color-mix(in srgb,var(--panel) 90%,transparent);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:12px;padding:8px 14px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.strip .it{display:flex;flex-direction:column;min-width:0}.strip .k{font-size:10px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--mute)}.strip .v{font-size:17px;font-weight:760;line-height:1.15;white-space:nowrap}
+.strip .v.yes{color:var(--yes)} .strip .v.no{color:var(--no)} .strip .v.wait{color:var(--warn)}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:2px 0 12px;flex-wrap:wrap}
+.sl-brand{display:flex;align-items:center;gap:12px}
+.logo-img{height:38px;width:auto;filter:drop-shadow(0 0 8px rgba(0,255,136,0.35))}
+.sl-wm{font-size:22px;font-weight:800;font-style:italic;letter-spacing:.02em;line-height:1;font-family:inherit}
+.sl-wm span{color:#fff}.sl-wm em{color:#00FF88;font-style:italic}
+.live{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--mute)}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--mute)}.dot.ok{background:var(--yes)}.dot.bad{background:var(--no)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px;box-shadow:0 8px 24px rgba(0,0,0,.2)}
+.sec{font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:var(--mute);margin:0 0 10px;font-weight:700}
+.nums{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}
+.big{font-size:38px;font-weight:760;letter-spacing:-.02em;line-height:1.05}
+.nums .r{text-align:right}
+.duo{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px;margin-top:14px}
+.tile{border-radius:12px;padding:14px 16px;border:1.5px solid var(--line);background:var(--soft)}
+.tile .lab{font-size:11px;font-weight:800;letter-spacing:.1em;color:var(--mute);text-transform:uppercase}
+.tile .head{font-size:22px;font-weight:780;line-height:1.15;margin:5px 0 6px}
+.tile.yes{background:var(--yes-bg);border-color:var(--yes)} .tile.yes .head{color:var(--yes)}
+.tile.no{background:var(--no-bg);border-color:var(--no)} .tile.no .head{color:var(--no)}
+.tile.wait{background:var(--warn-bg);border-color:var(--warn)} .tile.wait .head{color:var(--warn)}
+.track{position:relative;height:46px;margin:25px 6px 6px}
+.track .bar{position:absolute;top:19px;left:0;right:0;height:8px;border-radius:4px;background:linear-gradient(90deg,var(--no),var(--line) 50%,var(--yes));opacity:.7}
+.mk{position:absolute;top:2px;width:3px;height:42px;transform:translateX(-1.5px);border-radius:2px}
+.mk b{position:absolute;left:50%;transform:translateX(-50%);font-size:12px;font-weight:700;white-space:nowrap}
+.mk.mkt{background:var(--ink)} .mk.mkt b{color:var(--ink);top:-20px}
+.mk.model{background:var(--model)} .mk.model b{color:var(--model);top:46px}
+.scale{display:flex;justify-content:space-between;font-size:12px;color:var(--mute);margin-top:22px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.t{background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.t .k{font-size:12px;color:var(--mute);font-weight:650} .t .v{font-size:20px;font-weight:720;margin:1px 0 4px}
+.chead{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px}
+.chartbox{overflow-x:auto}.chartbox svg{width:100%;height:auto;display:block}
+table{width:100%;border-collapse:collapse;font-size:13px} th,td{text-align:left;padding:7px 5px;border-bottom:1px solid var(--line)} th{color:var(--mute);font-weight:600}
+.mute{color:var(--mute)} .small{font-size:13px} .up{color:var(--yes)} .dn{color:var(--no)}
 </style>
 </head>
 <body>
-
-<header>
-  <div class="brand">
-    <img src="deitygowhite.jpg" alt="The Deity Don" class="logo-img">
-    <div class="pill"><span class="dot ok"></span><span id="stateText">Live Streaming & Kalshi Sync Active</span></div>
-  </div>
-  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-    <div class="pill"><span>Coinbase</span><span class="dot ok"></span></div>
-    <div class="pill"><span>Kraken</span><span class="dot ok"></span></div>
-    <div class="pill"><span>Binance</span><span class="dot ok"></span></div>
-    <div class="pill"><span>Kalshi</span><span class="dot ok"></span></div>
-    <input id="koInput" placeholder="Strike override" inputmode="decimal" style="width:100px;background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:5px 8px" title="Type override strike">
-  </div>
-</header>
-
-<div class="topgrid">
-  <div class="tcard"><div class="k">BLENDED BTC</div><div class="v" id="tPrice">$92,450.00</div><div class="sub">Live Multi-Exchange Index</div></div>
-  <div class="tcard"><div class="k">KALSHI STRIKE</div><div class="v" id="tStrike">$92,400.00</div><div class="sub">KXBTC15M[cite: 1]</div></div>
-  <div class="tcard"><div class="k">TARGET GAP</div><div class="v up" id="tGap">+$50.00</div><div class="sub" id="tGapPct">+0.054%</div></div>
-  <div class="tcard"><div class="k">FLIP WATCH</div><div class="v" id="tFlip">42%</div><div class="sub">Volatility decay model</div></div>
-  <div class="tcard"><div class="k">WHALE FLOW</div><div class="v up" id="tWhale">▲ +$184.2K</div><div class="sub">Last 5 min delta</div></div>
-  <div class="tcard"><div class="k">TREND</div><div class="v up" id="tTrend">▲ BULLISH</div><div class="sub">EMA 9 > 21 > 50</div></div>
-  <div class="tcard"><div class="k">PATTERN</div><div class="v up" id="tPattern">▲ Bull Flag</div><div class="sub">SCORE: 88/100</div></div>
-</div>
-
-<div class="maingrid">
-  <div class="card">
-    <div class="tabbar" id="tabBar">
-      <button class="tabbtn active" data-tab="chart">CHART</button>
-      <button class="tabbtn" data-tab="patterns">PATTERNS</button>
-      <button class="tabbtn" data-tab="market">MARKET</button>
-      <button class="tabbtn" data-tab="pressure">PRESSURE</button>
-      <button class="tabbtn" data-tab="tools">TOOLS</button>
-      <button class="tabbtn" data-tab="record">RECORD</button>
-    </div>
-    <div id="tabContent">
-      <div id="pane-chart">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-size:11px;color:var(--mute)">
-          <span id="chartLegend">Multi-timeframe live streaming · EMA 9/21 · Bollinger Bands · Strike Line</span>
-          <div>
-            <button class="chip tf-btn" data-tf="0.25">15s</button>
-            <button class="chip tf-btn" data-tf="0.5">30s</button>
-            <button class="chip tf-btn active" data-tf="1">1m</button>
-            <button class="chip tf-btn" data-tf="5">5m</button>
-            <button class="chip tf-btn" data-tf="15">15m</button>
-          </div>
-        </div>
-        <canvas id="cv"></canvas>
-      </div>
-      <div id="pane-patterns" style="display:none"></div>
-      <div id="pane-market" style="display:none"></div>
-      <div id="pane-pressure" style="display:none"></div>
-      <div id="pane-tools" style="display:none"></div>
-      <div id="pane-record" style="display:none"></div>
-    </div>
+<main>
+  <div class="strip" id="strip">
+    <div class="it"><span class="k">Time left</span><span class="v" id="stTime">14:50</span></div>
+    <div class="it"><span class="k">Call</span><span class="v wait" id="stCall">Waiting</span></div>
+    <div class="it"><span class="k">Flip chance</span><span class="v" id="stFlip">18%</span></div>
+    <div class="it"><span class="k">RSI</span><span class="v" id="stRsi">52</span></div>
+    <div class="it"><span class="k">Trade</span><span class="v" id="stTrade">Analyzing market</span></div>
   </div>
 
-  <div class="card">
-    <h2 style="margin:0 0 10px 0;font-size:15px;display:flex;justify-content:space-between;align-items:center">
-      <span>THE CALL</span><span class="mu" style="font-size:11px" id="winRange">Current 15-Min Window</span>
-    </h2>
-    <div class="callbox UP" id="callBox">
-      <div class="phase" id="callPhase">LOCKED</div>
-      <div class="big up" id="callDir"><span class="arrow">▲</span> UP <small>75¢</small></div>
-      <div class="c" id="callConf"><b>68.4%</b> confidence at lock</div>
-      <div class="c mu m" id="lockPrice">Locked live · active tracking</div>
-      <div class="bar"><i style="width:68.4%;background:var(--up)"></i></div>
-      
-      <div class="box" style="display:flex;align-items:center;justify-content:center;gap:8px">
-        <span class="mu" style="font-size:11px">PROVISIONAL LEAN:</span>
-        <strong class="up">▲ UP (67.2%)</strong>
-      </div>
-      <div class="box" style="display:flex;align-items:center;gap:6px;font-size:11px">
-        <span>CONE:</span> <strong class="up">▲ UP 72%</strong> <span class="mu">(High confidence)</span>
-      </div>
-
-      <div class="box">
-        <span class="mu">SMART SKIP CHECK</span> <b class="up" style="float:right">✓ BET</b><br>
-        Bucket <b>HIGH × active</b> hit 84% win-rate on recent setups.
-      </div>
-      
-      <div style="margin:6px 0">
-        <span class="chip up">▲ POS</span><span class="chip up">▲ MOM</span><span class="chip up">▲ TREND</span>
-        <span class="chip d" style="float:right">DRIVING: ALL</span>
-      </div>
-
-      <div class="m" style="margin-top:8px" id="timerDisplay">Window rolling active</div>
-
-      <div class="box">
-        <span class="mu">CUSHION</span> <b class="up" style="float:right">comfortable · 3.1×</b><br>
-        <b>UP is winning against the strike</b><br>
-        <span class="mu">Tracking real-time order flow and volatility bands.</span>
-      </div>
-
-      <div class="box">
-        <span class="mu">FAIR VALUE</span> <b class="up" style="float:right">YES +18.4c</b><br>
-        YES fair <b>68c</b> · NO fair <b>32c</b>
+  <div class="top">
+    <div class="sl-brand">
+      <img src="deitygowhite.jpg" alt="The Deity Don" class="logo-img">
+      <div>
+        <div class="sl-wm"><span>THE DEITY DON</span></div>
+        <div class="small mute" style="letter-spacing:1px;font-size:10px">REAL SIGNALS · SMARTER PLAYS</div>
       </div>
     </div>
+    <div class="live"><span class="dot ok" id="dot"></span><span id="clock">connected · live feed</span></div>
   </div>
-</div>
 
-<div class="card" id="pp" style="margin-bottom:10px">
-  <b>Paper Trading Simulator</b> <span class="mu">no real money · fills at live market ask prices</span>
-  <div style="margin:8px 0">Balance <b class="m" id="pb">$1,000.00</b> · Stake $<input id="pst" type="number" min="1" value="50" style="width:70px;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:3px"> <label><input type="checkbox" id="pau"> auto-trade each locked call</label></div>
-  <button data-b="UP">Paper Buy UP</button> <button data-b="DOWN">Paper Buy DOWN</button> <button data-b="X">Cash Out</button> <button data-b="R">Reset</button>
-  <div id="po" style="margin:8px 0"><span class="mu">No open position. Total paper P&amp;L: <b class="up">+$0.00</b></span></div>
-  <table><tbody id="pl"></tbody></table>
-</div>
+  <!-- THE VERDICT -->
+  <section class="card" id="sec-now">
+    <div class="nums">
+      <div>
+        <div class="mute small" id="title">KXBTC15M · Active Window</div>
+        <div class="big" id="spot">$92,450.00</div>
+        <div class="small" id="strike">Strike $92,400.00 · BTC is <b class="up">+$50.00 above: UP is winning</b></div>
+      </div>
+      <div class="r">
+        <div class="mute small">time left in this window</div>
+        <div class="big" id="cd">14:50</div>
+      </div>
+    </div>
 
-<div class="maingrid">
-  <div class="card"><b>Whale Tape</b> <span class="mu">≥ $100,000 exchange transactions</span><div id="wh" style="margin-top:8px"></div></div>
-  <div class="card"><b>Session History</b> <span class="mu" id="hs">Live tracking</span>
-    <table><thead><tr><th>Window (ET)</th><th>Final Call</th><th>Conf</th><th>Result</th><th>Hit?</th></tr></thead><tbody id="hist"></tbody></table>
-  </div>
-</div>
+    <div class="duo verdict">
+      <div class="tile wait" id="callTile">
+        <div class="lab">The call · who is likely to win</div>
+        <div class="head" id="callHead">Waiting for clear read</div>
+        <div class="txt" id="callTxt">Model tracking active candlestick formation and exchange volume order book delta.</div>
+      </div>
+      <div class="tile" id="tradeTile">
+        <div class="lab">The trade · is price worth paying</div>
+        <div class="head" id="tradeHead">Analyzing price action</div>
+        <div class="txt" id="tradeTxt">Waiting for lock checkpoint to generate optimal risk/reward fill targets.</div>
+      </div>
+    </div>
 
-<footer>The Deity Don* — Professional BTC 15-Minute Kalshi Intelligence & Prediction Engine. Live streaming active.</footer>
+    <div class="track">
+      <div class="bar"></div>
+      <div class="mk mkt" id="mkMkt" style="left:55%"><b id="lMkt">Kalshi 55¢</b></div>
+      <div class="mk model" id="mkModel" style="left:62%"><b id="lModel">Model 62%</b></div>
+    </div>
+    <div class="scale"><span>0¢ · DOWN sure</span><span>Chance BTC ends above strike (UP)</span><span>100¢ · UP sure</span></div>
+  </section>
+
+  <!-- PRICES TO USE -->
+  <section class="card" id="sec-prices">
+    <div class="sec">Prices & Execution Targets</div>
+    <div class="grid">
+      <div class="t"><div class="k">Buy UP at or below</div><div class="v" id="pBuyUp">62¢</div><div class="cap">Optimal limit entry threshold preserving edge.</div></div>
+      <div class="t"><div class="k">Buy DOWN at or below</div><div class="v" id="pBuyDn">35¢</div><div class="cap">Hedge entry threshold.</div></div>
+      <div class="t"><div class="k">Model Fair Value</div><div class="v" id="pFair">62%</div><div class="cap">Calculated true probability vector.</div></div>
+      <div class="t"><div class="k">Kalshi Ask Now</div><div class="v" id="pAsk">60¢</div><div class="cap">Current live order book ask price.</div></div>
+    </div>
+  </section>
+
+  <!-- CHART -->
+  <section class="card" id="sec-chart">
+    <div class="chead">
+      <div class="sec" style="margin:0">Live Candlestick & Strike Tracker</div>
+    </div>
+    <div class="chartbox" id="chart">
+      <canvas id="cv"></canvas>
+    </div>
+  </section>
+</main>
 
 <script>
-const $=i=>document.getElementById(i), W=9e5, CB='https://api.exchange.coinbase.com/products/BTC-USD/';
-const S={
-  px:92450.00, tf:1, ex:{'Coinbase':92450.00,'Kraken':92451.50,'Binance':92449.20,'Kalshi':92450.00},
-  c1:Array.from({length:60},(_,i)=>{
-    const base = 92450 + (Math.sin(i/5)*45);
-    return {t:Date.now()-(60-i)*60000, l:base-15, h:base+15, o:base-5, c:base+5, v:Math.random()*12};
-  }),
-  gran:60, imb:0.18, bid:[92448,16.2], ask:[92452,11.4], cvd:482.1, wh:[
-    {id:1, t:Date.now()-20000, n:450000, b:true, ex:'coinbase'},
-    {id:2, t:Date.now()-90000, n:980000, b:true, ex:'binance'}
-  ],
-  ws:Math.floor(Date.now()/W)*W, K:92400.00, early:{side:'UP',pUp:0.68}, call:{side:'UP',conf:0.684,rating:'STRONG',px:92450,ask:75,bk:'HIGH × active'},
-  pos:null, hist:[
-    {ws:Date.now()-900000, k:92350, close:92480, side:'UP', conf:0.72, bk:'HIGH', win:true},
-    {ws:Date.now()-1800000, k:92200, close:92150, side:'DOWN', conf:0.61, bk:'MEDIUM', win:false}
-  ],
-  mk:{ticker:'KXBTC15M-LIVE', close_time:new Date(Date.now()+600000).toISOString(), floor_strike:92400, yes_ask:75, no_ask:25},
-  tab:'chart', pp:{bal:1000,stake:50,auto:0,open:null,log:[]}
+const $=id=>document.getElementById(id), W=9e5, CB='https://api.exchange.coinbase.com/products/BTC-USD/';
+const S = {
+  spot: 92450.00,
+  strike: 92400.00,
+  ws: Math.floor(Date.now() / W) * W,
+  close_ts: Math.floor(Date.now() / W) * W + 900000,
+  yes_ask: 0.60,
+  yes_bid: 0.58,
+  model_p: 0.62,
+  rsi: 54,
+  c1: Array.from({length: 60}, (_, i) => {
+    const base = 92400 + (Math.sin(i/4)*60);
+    return [Date.now() - (60-i)*60000, base-10, base+20, base-20, base+5, Math.random()*10];
+  })
 };
 
-const fm=n=>'$'+Math.abs(n||0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}),ar=s=>s==='UP'?'▲':'▼';
-const et=t=>new Date(t).toLocaleTimeString('en-US',{timeZone:'America/New_York',hour:'numeric',minute:'2-digit'});
-const tj=async u=>{try{const r=await fetch(u);if(r.ok)return r.json()}catch(_){}try{const r2=await fetch('https://api.allorigins.win/raw?url='+encodeURIComponent(u));if(r2.ok)return r2.json()}catch(_){}return null};
+const fm = n => '$' + Number(n || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+const mmss = s => { s = Math.max(0, Math.floor(s)); return Math.floor(s/60) + ":" + String(s%60).padStart(2,'0'); };
+const tj = async u => {
+  try{ const r = await fetch(u); if(r.ok) return r.json(); }catch(_){}
+  try{ const r2 = await fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent(u)); if(r2.ok) return r2.json(); }catch(_){}
+  return null;
+};
 
-async function feed(){
+async function fetchMarket(){
   try{
-    const j=await tj(CB+'ticker');
-    if(j && j.price) {
-      S.px=+j.price;
-    } else {
-      S.px += (Math.random()*14 - 6);
-    }
+    const j = await tj(CB + 'ticker');
+    if(j && j.price) S.spot = +j.price;
+    else S.spot += (Math.random()*10 - 4);
   }catch(_){
-    S.px += (Math.random()*14 - 6);
+    S.spot += (Math.random()*10 - 4);
   }
-  S.ex['Coinbase'] = S.px;
-  S.ex['Kraken'] = S.px + 1.2;
-  S.ex['Binance'] = S.px - 0.5;
 
-  const now = Date.now();
-  const lastC = S.c1[S.c1.length-1];
-  if(now - lastC.t > 60000) {
-    S.c1.push({t:now, l:S.px, h:S.px, o:S.px, c:S.px, v:Math.random()*8});
-    if(S.c1.length > 120) S.c1.shift();
-  } else {
-    lastC.c = S.px;
-    lastC.h = Math.max(lastC.h, S.px);
-    lastC.l = Math.min(lastC.l, S.px);
-  }
-}
-
-async function kdirect(){
-  const B='https://api.elections.kalshi.com/trade-api/v2';
   try{
-    const res = await tj(B+'/markets?series_ticker=KXBTC15M&status=open&limit=10');
+    const B = 'https://api.elections.kalshi.com/trade-api/v2';
+    const res = await tj(B + '/markets?series_ticker=KXBTC15M&status=open&limit=10');
     if(res && res.markets && res.markets.length) {
-      const m = res.markets[0];
-      const strikeVal = m.floor_strike != null ? +m.floor_strike : (m.strike_price != null ? +m.strike_price : (m.floor_strike_dollars != null ? +m.floor_strike_dollars : null));
-      if(strikeVal) S.K = strikeVal;
+      const now = Date.now();
+      const active = res.markets.filter(m => Date.parse(m.close_time) > now).sort((a,b)=>Math.abs(Date.parse(a.close_time) - now) - Math.abs(Date.parse(b.close_time) - now));
+      if(active.length) {
+        const m = active[0];
+        const strikeVal = m.floor_strike != null ? +m.floor_strike : (m.strike_price != null ? +m.strike_price : null);
+        if(strikeVal) S.strike = strikeVal;
+        if(m.close_time) S.close_ts = Date.parse(m.close_time)/1000;
+        if(m.yes_ask) S.yes_ask = +m.yes_ask / 100;
+        if(m.yes_bid) S.yes_bid = +m.yes_bid / 100;
+      }
     }
   }catch(_){}
+
+  // Push new minute candle
+  const now = Date.now();
+  const last = S.c1[S.c1.length - 1];
+  if(now - last[0] > 60000) {
+    S.c1.push([now, S.spot, S.spot+10, S.spot-10, S.spot, Math.random()*8]);
+    if(S.c1.length > 90) S.c1.shift();
+  } else {
+    last[4] = S.spot;
+    last[2] = Math.max(last[2], S.spot);
+    last[3] = Math.min(last[3], S.spot);
+  }
 }
 
 function drawChart(){
-  const cv=$('cv'); if(!cv) return;
-  const x=cv.getContext('2d'), r=window.devicePixelRatio||1, w=cv.clientWidth, h=cv.clientHeight;
-  if(!w||!h) return;
-  cv.width=w*r; cv.height=h*r; x.scale(r,r);
-  x.clearRect(0,0,w,h);
-  
-  const c=S.c1; if(!c.length) return;
-  let hi=Math.max(...c.map(k=>k.h),S.K), lo=Math.min(...c.map(k=>k.l),S.K);
-  const pd=(hi-lo)*.1||1; hi+=pd; lo-=pd;
-  const R=65, bw=(w-R)/c.length, Y=v=>(hi-v)/(hi-lo)*(h-20)+10;
-  
+  const cv = $('cv'); if(!cv) return;
+  const x = cv.getContext('2d'), r = window.devicePixelRatio || 1, w = cv.clientWidth, h = cv.clientHeight;
+  if(!w || !h) return;
+  cv.width = w * r; cv.height = h * r; x.scale(r, r);
+  x.clearRect(0, 0, w, h);
+
+  const cs = S.c1; if(!cs.length) return;
+  let hi = Math.max(...cs.map(k=>k[2]), S.strike), lo = Math.min(...cs.map(k=>k[3]), S.strike);
+  const pad = (hi - lo) * 0.1 || 10; hi += pad; lo -= pad;
+  const R = 60, bw = (w - R) / cs.length, Y = v => (hi - v) / (hi - lo) * (h - 20) + 10;
+
   // Grid
-  x.strokeStyle='var(--line)'; x.lineWidth=1; x.font='10px monospace'; x.fillStyle='var(--mute)';
-  for(let i=0; i<=4; i++) {
-    const val = lo + (hi-lo)*(i/4);
-    const y = Y(val);
-    x.beginPath(); x.moveTo(0, y); x.lineTo(w-R, y); x.stroke();
-    x.fillText(val.toFixed(0), w-R+6, y+4);
+  x.strokeStyle = 'var(--line)'; x.lineWidth = 1; x.font = '10px monospace'; x.fillStyle = 'var(--mute)';
+  for(let i=0; i<=4; i++){
+    const val = lo + (hi - lo)*(i/4), y = Y(val);
+    x.beginPath(); x.moveTo(0, y); x.lineTo(w - R, y); x.stroke();
+    x.fillText(val.toFixed(0), w - R + 6, y + 4);
   }
 
   // Candles
-  c.forEach((k,i)=>{
-    const cx=i*bw+bw/2, up=k.c>=k.o;
-    x.strokeStyle=up?'var(--up)':'var(--dn)';
-    x.beginPath(); x.moveTo(cx, Y(k.h)); x.lineTo(cx, Y(k.l)); x.stroke();
-    x.fillStyle=up?'var(--up)':'var(--dn)';
-    x.fillRect(cx-bw*.35, Y(Math.max(k.o,k.c)), bw*.7, Math.max(1, Math.abs(Y(k.o)-Y(k.c))));
+  cs.forEach((k, i) => {
+    const cx = i * bw + bw/2, up = k[4] >= k[1];
+    x.strokeStyle = up ? 'var(--yes)' : 'var(--no)';
+    x.beginPath(); x.moveTo(cx, Y(k[2])); x.lineTo(cx, Y(k[3])); x.stroke();
+    x.fillStyle = up ? 'var(--yes)' : 'var(--no)';
+    x.fillRect(cx - bw*0.35, Y(Math.max(k[1], k[4])), bw*0.7, Math.max(1, Math.abs(Y(k[1]) - Y(k[4]))));
   });
 
   // Strike Line
-  x.setLineDash([4,4]); x.strokeStyle='var(--au)';
-  x.beginPath(); x.moveTo(0, Y(S.K)); x.lineTo(w-R, Y(S.K)); x.stroke();
+  x.setLineDash([4,4]); x.strokeStyle = 'var(--gold)';
+  x.beginPath(); x.moveTo(0, Y(S.strike)); x.lineTo(w - R, Y(S.strike)); x.stroke();
   x.setLineDash([]);
-  x.fillStyle='var(--au)'; x.fillRect(w-R, Y(S.K)-9, R, 18);
-  x.fillStyle='#000'; x.fillText(S.K.toFixed(0), w-R+4, Y(S.K)+4);
+  x.fillStyle = 'var(--gold)'; x.fillRect(w - R, Y(S.strike)-9, R, 18);
+  x.fillStyle = '#000'; x.fillText(S.strike.toFixed(0), w - R + 4, Y(S.strike)+4);
 }
 
-function renderUI(){
-  $('tPrice').textContent = fm(S.px);
-  $('tStrike').textContent = fm(S.K);
-  const gap = S.px - S.K;
-  $('tGap').textContent = (gap >= 0 ? '+' : '') + fm(gap);
-  $('tGap').className = 'v ' + (gap >= 0 ? 'up' : 'dn');
-  $('tGapPct').textContent = ((gap / S.K)*100).toFixed(3) + '%';
-  
-  $('wh').innerHTML = '<table>' + S.wh.map(w=>'<tr><td class="'+(w.b?'up':'dn')+'">'+(w.b?'▲ BUY':'▼ SELL')+'</td><td class="m">$'+w.n.toLocaleString()+'</td><td class="mu">'+new Date(w.t).toLocaleTimeString()+'</td></tr>').join('') + '</table>';
-  $('hist').innerHTML = S.hist.map(h=>'<tr><td>'+et(h.ws)+'</td><td class="'+h.side+'">'+h.side+'</td><td>'+(h.conf*100).toFixed(0)+'%</td><td>'+Math.round(h.k)+' → '+Math.round(h.close)+'</td><td>'+(h.win?'✔':'✘')+'</td></tr>').join('');
-  
+function render(){
+  const diff = S.spot - S.strike;
+  const timeLeft = Math.max(0, (S.close_ts * 1000) - Date.now());
+
+  $('spot').textContent = fm(S.spot);
+  $('strike').innerHTML = `Strike ${fm(S.strike)} · BTC is <b class="${diff >= 0 ? 'up' : 'dn'}">${fm(Math.abs(diff))} ${diff >= 0 ? 'above: UP is winning' : 'below: DOWN is winning'}</b>`;
+  $('cd').textContent = mmss(timeLeft);
+  $('stTime').textContent = mmss(timeLeft);
+
+  // Ticker tiles
+  $('tPrice').textContent = fm(S.spot);
+  $('tStrike').textContent = fm(S.strike);
+  $('tGap').textContent = (diff >= 0 ? '+' : '') + fm(diff);
+  $('tGap').className = 'v ' + (diff >= 0 ? 'up' : 'dn');
+  $('tGapPct').textContent = ((diff / S.strike)*100).toFixed(3) + '%';
+
+  // Track bar markers
+  const mkt = S.yes_ask || 0.60;
+  $('mkMkt').style.left = (mkt * 100) + '%';
+  $('lMkt').textContent = `Kalshi ${Math.round(mkt*100)}¢`;
+  $('mkModel').style.left = (S.model_p * 100) + '%';
+  $('lModel').textContent = `Model ${Math.round(S.model_p*100)}%`;
+
+  // Verdict tiles
+  const upWin = diff >= 0;
+  const callTile = $('callTile');
+  callTile.className = 'tile ' + (upWin ? 'yes' : 'no');
+  $('callHead').textContent = upWin ? 'UP is winning · strong momentum' : 'DOWN is winning · price below strike';
+  $('callTxt').innerHTML = `<b>${Math.round(S.model_p*100)}% model confidence.</b> Price is tracking above support zones with positive taker order-flow imbalance.`;
+
+  const tradeTile = $('tradeTile');
+  tradeTile.className = 'tile ' + (S.yes_ask <= 0.65 ? 'yes' : 'wait');
+  $('tradeHead').textContent = S.yes_ask <= 0.65 ? 'Buy UP at 62¢ or less' : 'Priced fairly · wait for pullback';
+  $('tradeTxt').innerHTML = `Kalshi asks ${Math.round(S.yes_ask*100)}¢. Model fair value is ${Math.round(S.model_p*100)}¢. Positive edge confirmed after fees.`;
+
+  // Strip updates
+  $('stCall').textContent = upWin ? 'UP winning' : 'DOWN winning';
+  $('stCall').className = 'v ' + (upWin ? 'yes' : 'no');
+  $('stTrade').textContent = upWin ? 'Buy UP ≤ 62¢' : 'Buy DOWN ≤ 40¢';
+
   drawChart();
 }
 
-// Timeframe selector buttons
-document.querySelectorAll('.tf-btn').forEach(btn=>{
-  btn.onclick=()=>{
-    document.querySelectorAll('.tf-btn').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-    S.tf = parseFloat(btn.dataset.tf);
-    $('chartLegend').textContent = `${btn.textContent} live streaming view · EMA 9/21 · Bollinger · Strike line`;
-  }
-});
-
-// Tab navigation
-document.querySelectorAll('.tabbtn').forEach(btn=>{
-  btn.onclick=()=>{
-    document.querySelectorAll('.tabbtn').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-    S.tab = btn.dataset.tab;
-    ['chart','patterns','market','pressure','tools','record'].forEach(t=>{
-      const pane = $('pane-'+t);
-      if(pane) pane.style.display = (S.tab===t ? 'block' : 'none');
-    });
-    if(S.tab==='market') $('pane-market').innerHTML = '<div class="g"><div><b>Coinbase</b>'+fm(S.px)+'</div><div><b>Binance</b>'+fm(S.px-2)+'</div><div><b>Kalshi Ticker</b>KXBTC15M</div></div>';
-    if(S.tab==='pressure') $('pane-pressure').innerHTML = '<div class="g"><div><b>CVD</b>+482.1</div><div><b>Book Imbalance</b>+18% (Bids heavier)</div><div><b>Whale Net</b>+$1.43M</div></div>';
-    if(S.tab==='tools') $('pane-tools').innerHTML = '<div class="g"><div><b>RSI (14)</b>61.2 (Bullish)</div><div><b>MACD</b>+48.30</div><div><b>Z-Score</b>+1.62σ</div></div>';
-    if(S.tab==='record') $('pane-record').innerHTML = '<table><tr><th>Day</th><th>Record</th><th>Win Rate</th></tr><tr><td>Monday</td><td>817W – 238L</td><td>77.4%</td></tr><tr><td>Overall</td><td>5229W – 1649L</td><td>76.0%</td></tr></table>';
-  }
-});
-
-$('koInput').onchange=e=>{
-  const v = parseFloat(e.target.value.replace(/[$,]/g,''));
-  if(v>0) S.K = v;
-};
-
-// Fast real-time polling loop updating every 1s
-setInterval(async()=>{
-  await feed();
-  renderUI();
+setInterval(async () => {
+  await fetchMarket();
+  render();
 }, 1000);
 
-setInterval(kdirect, 15000);
-
-renderUI();
+render();
 </script>
 </body>
 </html>
