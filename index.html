@@ -3,25 +3,26 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Strikeline — BTC 15-Min Kalshi Prediction</title>
+<title>The Deity Don — BTC 15-Min Kalshi Prediction</title>
 <style>
 :root{color-scheme:dark;--bg:#0b0d10;--cd:#12151a;--ln:#242a33;--ink:#e9edf2;--mu:#8b95a3;--up:#3ddc84;--dn:#ff4d6d;--au:#f5c542;--blue:#4aa3ff;--purple:#b066ff}
 [data-theme="light"]{--bg:#f4f6f9;--cd:#ffffff;--ln:#d0d7de;--ink:#1f2328;--mu:#656d76;--up:#1a7f37;--dn:#cf222e;--au:#9a6700;--blue:#0969da;--purple:#8250df}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:13px/1.45 Inter,system-ui,sans-serif;padding:12px 14px}
 .m{font-family:ui-monospace,Menlo,monospace}.mu{color:var(--mu)}.UP,.up{color:var(--up)}.DOWN,.dn{color:var(--dn)}.au{color:var(--au)}
-header{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}header b{font-size:18px;margin-right:6px}
-.brand{display:flex;align-items:center;gap:10px}
-.pill{border:1px solid var(--ln);border-radius:20px;padding:3px 10px;font-size:12px;background:var(--cd);display:inline-flex;align-items:center;gap:5px}
+header{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-bottom:12px;border-bottom:1px solid var(--ln);padding-bottom:10px}
+.brand{display:flex;align-items:center;gap:12px}
+.logo-text{font-size:20px;font-weight:900;font-style:italic;letter-spacing:-0.5px;color:#fff;background:linear-gradient(45deg,#fff,#888);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.pill{border:1px solid var(--ln);border-radius:20px;padding:4px 12px;font-size:12px;background:var(--cd);display:inline-flex;align-items:center;gap:6px}
 .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--dn)}.dot.ok{background:var(--up)}
-button{font:inherit;background:var(--cd);color:var(--ink);border:1px solid var(--ln);border-radius:8px;padding:5px 10px;cursor:pointer}button.on{background:var(--blue);border-color:var(--blue);color:#fff}button:focus-visible{outline:2px solid var(--au)}
-.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:8px;margin-bottom:12px}
+button{font:inherit;background:var(--cd);color:var(--ink);border:1px solid var(--ln);border-radius:8px;padding:6px 12px;cursor:pointer}button.on{background:var(--blue);border-color:var(--blue);color:#fff}button:focus-visible{outline:2px solid var(--au)}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:12px}
 .tile,.card{background:var(--cd);border:1px solid var(--ln);border-radius:10px;padding:10px 12px}
 .tile .lbl{font-size:11px;color:var(--mu);text-transform:uppercase}.tile .val{font-size:19px;font-weight:700}.tile .sub{font-size:11px;color:var(--mu);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.maingrid{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(300px,1fr);gap:12px;margin-bottom:12px}@media(max-width:900px){.maingrid{grid-template-columns:1fr}}
-.tabbar{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;border-bottom:1px solid var(--ln);padding-bottom:8px}
+.maingrid{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(320px,1fr);gap:12px;margin-bottom:12px}@media(max-width:900px){.maingrid{grid-template-columns:1fr}}
+.tabbar{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;border-bottom:1px solid var(--ln);padding-bottom:6px}
 .tabbtn{border:0;background:none;color:var(--mu);border-bottom:2px solid transparent;border-radius:0;padding:6px 12px;font-weight:600}
 .tabbtn.active{background:none;color:var(--ink);border-color:var(--up)}
-canvas{width:100%;height:320px;display:block}
+canvas{width:100%;height:340px;display:block}
 .g{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}.g div{border:1px solid var(--ln);border-radius:8px;padding:8px 10px}.g b{font-size:17px;display:block}
 .callbox{border:1px solid #1e6b43;background:linear-gradient(135deg,rgba(16,38,26,0.6),rgba(18,21,26,0.9));border-radius:12px;padding:14px}
 .callbox.DOWN{border-color:#7a2236;background:linear-gradient(135deg,rgba(42,17,25,0.6),rgba(18,21,26,0.9))}
@@ -32,8 +33,6 @@ canvas{width:100%;height:320px;display:block}
 .chip{display:inline-block;border:1px solid var(--ln);border-radius:6px;padding:2px 7px;margin:2px;font-size:11px}
 .chip.UP{border-color:#1e6b43;color:var(--up)}.chip.DOWN{border-color:#7a2236;color:var(--dn)}.chip.d{background:#1e6b43;color:#fff}
 table{width:100%;border-collapse:collapse}td,th{padding:6px 8px;text-align:left;border-bottom:1px solid var(--ln);font-size:12px}th{color:var(--mu);font-weight:400}
-.standby-lean{display:flex;align-items:center;justify-content:center;gap:8px;background:rgba(255,255,255,0.05);padding:6px 12px;border-radius:8px;margin:8px 0}
-.standby-cone{display:inline-flex;align-items:center;gap:6px;font-size:11px;background:rgba(46,230,255,0.1);border:1px solid rgba(46,230,255,0.3);padding:3px 8px;border-radius:6px;margin-top:4px}
 footer{margin-top:20px;text-align:center;font-size:11px;color:var(--mu)}
 </style>
 </head>
@@ -41,20 +40,19 @@ footer{margin-top:20px;text-align:center;font-size:11px;color:var(--mu)}
 
 <header>
   <div class="brand">
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="var(--up)"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-    <div>
-      <b>STRIKELINE</b> <span class="pill" id="liveStateBadge"><span class="dot ok"></span><span id="stateText">Too early to call - leaning DOWN</span></span>
-    </div>
+    <div class="logo-text">The Deity Don*</div>
+    <div class="pill" id="liveStateBadge"><span class="dot ok"></span><span id="stateText">Too early to call - leaning DOWN</span></div>
   </div>
-  <button id="howBtn">How to Use</button>
-  <div class="pill" id="chipRecord">Record: 58W–20L (74.4%)</div>
-  <div class="pill" id="chipStreak">Streak: 2L</div>
-  <div class="pill"><span class="dot ok" id="dotCoinbase"></span>Coinbase</div>
-  <div class="pill"><span class="dot ok" id="dotKraken"></span>Kraken</div>
-  <div class="pill"><span class="dot ok" id="dotKalshi"></span>Kalshi</div>
-  <button id="voiceBtn" type="button">Voice off</button>
-  <button id="themeBtn" type="button">🌙 Dark</button>
-  <input id="koInput" placeholder="Strike override" inputmode="decimal" style="width:110px;background:var(--cd);color:var(--ink);border:1px solid var(--ln);border-radius:8px;padding:5px 8px" title="Type override strike">
+  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+    <div class="pill" id="chipRecord">Record: 58W–20L (74.4%)</div>
+    <div class="pill" id="chipStreak">Streak: 2L</div>
+    <div class="pill"><span class="dot ok" id="dotCoinbase"></span>Coinbase</div>
+    <div class="pill"><span class="dot ok" id="dotKraken"></span>Kraken</div>
+    <div class="pill"><span class="dot ok" id="dotKalshi"></span>Kalshi</div>
+    <button id="voiceBtn" type="button">Voice off</button>
+    <button id="themeBtn" type="button">🌙 Dark</button>
+    <input id="koInput" placeholder="Strike override" inputmode="decimal" style="width:100px;background:var(--cd);color:var(--ink);border:1px solid var(--ln);border-radius:8px;padding:5px 8px" title="Type override strike">
+  </div>
 </header>
 
 <div class="tiles">
@@ -70,7 +68,7 @@ footer{margin-top:20px;text-align:center;font-size:11px;color:var(--mu)}
 <div class="maingrid">
   <div class="card">
     <div class="tabbar" id="tabBar">
-      <button class="tabbtn active" data-tab="chart">Chart</button>
+      <button class="tabbtn active" data-tab="chart">Chart Viewer</button>
       <button class="tabbtn" data-tab="patterns">Patterns</button>
       <button class="tabbtn" data-tab="market">Market</button>
       <button class="tabbtn" data-tab="pressure">Pressure</button>
@@ -80,13 +78,13 @@ footer{margin-top:20px;text-align:center;font-size:11px;color:var(--mu)}
     <div id="tabContent">
       <div id="pane-chart">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-size:11px;color:var(--mu)">
-          <span>candles built from live Coinbase + Kraken blend · EMA 9/21 · SMA 50 · Strike line</span>
+          <span id="chartLegend">Multi-timeframe viewer · EMA 9/21 · Bollinger · Strike line</span>
           <div>
-            <button class="chip" data-tf="0.25">15s</button>
-            <button class="chip" data-tf="0.5">30s</button>
-            <button class="chip active" data-tf="1">1m</button>
-            <button class="chip" data-tf="5">5m</button>
-            <button class="chip" data-tf="15">15m</button>
+            <button class="chip tf-btn" data-tf="0.25">15s</button>
+            <button class="chip tf-btn" data-tf="0.5">30s</button>
+            <button class="chip tf-btn active" data-tf="1">1m</button>
+            <button class="chip tf-btn" data-tf="5">5m</button>
+            <button class="chip tf-btn" data-tf="15">15m</button>
           </div>
         </div>
         <canvas id="cv"></canvas>
@@ -110,12 +108,12 @@ footer{margin-top:20px;text-align:center;font-size:11px;color:var(--mu)}
       <div class="c mu m" id="lockPrice">Locked @ $80,704 · 7:00 into round</div>
       <div class="bar"><i style="width:40.7%;background:var(--dn)"></i></div>
       
-      <div class="standby-lean" id="standbyLean">
+      <div class="box" style="display:flex;align-items:center;justify-content:center;gap:8px">
         <span class="mu" style="font-size:11px">PROVISIONAL LEAN:</span>
         <strong class="down">▼ DOWN (58.2%)</strong>
       </div>
-      <div class="standby-cone" id="standbyCone">
-        <span>CONE:</span> <strong class="down">▼ DOWN 71%</strong> <span class="mu">(Medium conf)</span>
+      <div class="box" style="display:flex;align-items:center;gap:6px;font-size:11px">
+        <span>CONE:</span> <strong class="down">▼ DOWN 71%</strong> <span class="mu">(Medium confidence)</span>
       </div>
 
       <div class="box">
@@ -145,7 +143,7 @@ footer{margin-top:20px;text-align:center;font-size:11px;color:var(--mu)}
 </div>
 
 <div class="card" id="pp" style="margin-bottom:12px">
-  <b>Paper trading</b> <span class="mu">no real money · fills at Kalshi ask or model fair price</span>
+  <b>Paper trading simulator</b> <span class="mu">no real money · fills at Kalshi ask or model fair price</span>
   <div style="margin:8px 0">Balance <b class="m" id="pb">$1,000.00</b> · Stake $<input id="pst" type="number" min="1" value="50" style="width:70px;background:var(--bg);color:var(--ink);border:1px solid var(--ln);border-radius:6px;padding:3px"> <label><input type="checkbox" id="pau"> auto-trade each locked call</label></div>
   <button data-b="UP">Paper buy UP</button> <button data-b="DOWN">Paper buy DOWN</button> <button data-b="X">Cash out</button> <button data-b="R">Reset</button>
   <div id="po" style="margin:8px 0"><span class="mu">No open position. Total paper P&amp;L: <b class="up">+$0.00</b></span></div>
@@ -159,13 +157,13 @@ footer{margin-top:20px;text-align:center;font-size:11px;color:var(--mu)}
   </div>
 </div>
 
-<footer>Strikeline is an informational market intelligence tool, not financial advice. Kalshi 15-min predictions approximate BRTI settlement.</footer>
+<footer>The Deity Don* — Professional BTC 15-Minute Kalshi Intelligence & Prediction Engine. Not financial advice.</footer>
 
 <script>
-const $=i=>document.getElementById(i), W=9e5, LOCK=7, EARLY=3, WHALE=1e5, CB='https://api.exchange.coinbase.com/products/BTC-USD/';
+const $=i=>document.getElementById(i), W=9e5, CB='https://api.exchange.coinbase.com/products/BTC-USD/';
 const S={
-  px:80456.27, ex:{'Coinbase':80456.27,'Kraken':80458.10,'Gemini':80455.00,'Bitstamp':80456.00},
-  c1:Array.from({length:60},(_,i)=>({t:Date.now()-(60-i)*60000,l:80300,h:80600,o:80400,c:80400+Math.random()*100})),
+  px:80456.27, tf:1, ex:{'Coinbase':80456.27,'Kraken':80458.10,'Gemini':80455.00,'Bitstamp':80456.00},
+  c1:Array.from({length:120},(_,i)=>({t:Date.now()-(120-i)*30000,l:80300,h:80600,o:80400,c:80400+Math.random()*120})),
   gran:60, imb:-0.05, bid:[80450,12.4], ask:[80460,8.1], cvd:-223.7, wh:[
     {id:1, t:Date.now()-60000, n:1106594, b:false, ex:'coinbase'},
     {id:2, t:Date.now()-180000, n:1000639, b:false, ex:'coinbase'}
@@ -181,7 +179,7 @@ const S={
 
 const phi=z=>{const t=1/(1+.2316419*Math.abs(z)),p=.3989423*Math.exp(-z*z/2)*t*(.3193815+t*(-.3565638+t*(1.781478+t*(-1.821256+t*1.330274))));return z>0?1-p:p};
 const fm=n=>'$'+Math.abs(n||0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}),ar=s=>s==='UP'?'▲':'▼';
-const et=t=>new Date(t).toLocaleTimeString('en-US',{timeZone:'America/New_York',hour:'numeric',minute:'2-digit'}),mmss=ms=>{const s=Math.max(0,Math.floor(ms/1e3));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
+const et=t=>new Date(t).toLocaleTimeString('en-US',{timeZone:'America/New_York',hour:'numeric',minute:'2-digit'});
 const tj=async u=>{try{const r=await fetch(u);if(r.ok)return r.json()}catch(_){}try{const r2=await fetch('https://api.allorigins.win/raw?url='+encodeURIComponent(u));if(r2.ok)return r2.json()}catch(_){}return null};
 
 async function feed(){
@@ -200,95 +198,4 @@ async function kdirect(){
     if(res && res.markets && res.markets.length) {
       const m = res.markets[0];
       const strikeVal = m.floor_strike != null ? +m.floor_strike : +m.strike_price;
-      if(strikeVal) S.K = strikeVal;
-    }
-  }catch(_){}
-}
-
-function drawChart(){
-  const cv=$('cv'); if(!cv) return;
-  const x=cv.getContext('2d'), r=window.devicePixelRatio||1, w=cv.clientWidth, h=cv.clientHeight;
-  if(!w||!h) return;
-  cv.width=w*r; cv.height=h*r; x.scale(r,r);
-  x.clearRect(0,0,w,h);
-  
-  const c=S.c1; if(!c.length) return;
-  let hi=Math.max(...c.map(k=>k.h),S.K), lo=Math.min(...c.map(k=>k.l),S.K);
-  const pd=(hi-lo)*.1||1; hi+=pd; lo-=pd;
-  const R=60, bw=(w-R)/c.length, Y=v=>(hi-v)/(hi-lo)*(h-20)+10;
-  
-  x.font='11px monospace'; x.strokeStyle='#242a33';
-  c.forEach((k,i)=>{
-    const cx=i*bw+bw/2, up=k.c>=k.o;
-    x.strokeStyle=up?'var(--up)':'var(--dn)';
-    x.beginPath(); x.moveTo(cx, Y(k.h)); x.lineTo(cx, Y(k.l)); x.stroke();
-    x.fillStyle=up?'var(--up)':'var(--dn)';
-    x.fillRect(cx-bw*.35, Y(Math.max(k.o,k.c)), bw*.7, Math.max(1, Math.abs(Y(k.o)-Y(k.c))));
-  });
-
-  // Strike line
-  x.setLineDash([4,4]); x.strokeStyle='var(--au)';
-  x.beginPath(); x.moveTo(0, Y(S.K)); x.lineTo(w-R, Y(S.K)); x.stroke();
-  x.setLineDash([]);
-  x.fillStyle='var(--au)'; x.fillRect(w-R, Y(S.K)-8, R, 16);
-  x.fillStyle='#000'; x.fillText(S.K.toFixed(0), w-R+4, Y(S.K)+4);
-}
-
-function renderUI(){
-  $('tPrice').textContent = fm(S.px);
-  $('tStrike').textContent = fm(S.K);
-  const gap = S.px - S.K;
-  $('tGap').textContent = (gap >= 0 ? '+' : '') + fm(gap);
-  $('tGap').className = 'val ' + (gap >= 0 ? 'up' : 'down');
-  $('tGapPct').textContent = ((gap / S.K)*100).toFixed(3) + '%';
-  
-  // Whale tape
-  $('wh').innerHTML = '<table>' + S.wh.map(w=>'<tr><td class="'+(w.b?'up':'dn')+'">'+(w.b?'▲ BUY':'▼ SELL')+'</td><td class="m">$'+w.n.toLocaleString()+'</td><td class="mu">'+new Date(w.t).toLocaleTimeString()+'</td></tr>').join('') + '</table>';
-  
-  // Session history
-  $('hist').innerHTML = S.hist.map(h=>'<tr><td>'+et(h.ws)+'</td><td class="'+h.side+'">'+h.side+'</td><td>'+(h.conf*100).toFixed(0)+'%</td><td>'+Math.round(h.k)+' → '+Math.round(h.close)+'</td><td>'+(h.win?'✔':'✘')+'</td></tr>').join('');
-  
-  drawChart();
-}
-
-// Tab wiring
-document.querySelectorAll('.tabbtn').forEach(btn=>{
-  btn.onclick=()=>{
-    document.querySelectorAll('.tabbtn').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-    S.tab = btn.dataset.tab;
-    ['chart','patterns','market','pressure','tools','record'].forEach(t=>{
-      const pane = $('pane-'+t);
-      if(pane) pane.style.display = (S.tab===t ? 'block' : 'none');
-    });
-    if(S.tab==='market') $('pane-market').innerHTML = '<div class="g"><div><b>Coinbase</b>'+fm(S.px)+'</div><div><b>Kraken</b>'+fm(S.px+2)+'</div><div><b>Kalshi Ticker</b>KXBTC15M</div></div>';
-    if(S.tab==='pressure') $('pane-pressure').innerHTML = '<div class="g"><div><b>CVD</b>-223.7</div><div><b>Book Imbalance</b>-5% (Balanced)</div><div><b>Whale Net</b>-$9.1M</div></div>';
-    if(S.tab==='tools') $('pane-tools').innerHTML = '<div class="g"><div><b>RSI (14)</b>30.0 (Neutral)</div><div><b>MACD</b>-24.60</div><div><b>Z-Score</b>-3.38σ</div></div>';
-    if(S.tab==='record') $('pane-record').innerHTML = '<table><tr><th>Day</th><th>Record</th><th>Win Rate</th></tr><tr><td>Monday</td><td>817W – 238L</td><td>77.4%</td></tr><tr><td>Overall</td><td>5229W – 1649L</td><td>76.0%</td></tr></table>';
-  }
-});
-
-// Theme toggle
-$('themeBtn').onclick=()=>{
-  const d = document.documentElement;
-  const isDark = d.getAttribute('data-theme')==='dark';
-  d.setAttribute('data-theme', isDark ? 'light' : 'dark');
-  $('themeBtn').textContent = isDark ? '☀️ Light' : '🌙 Dark';
-};
-
-$('koInput').onchange=e=>{
-  const v = parseFloat(e.target.value.replace(/[$,]/g,''));
-  if(v>0) S.K = v;
-};
-
-setInterval(async()=>{
-  await feed();
-  renderUI();
-}, 2000);
-
-setInterval(kdirect, 15000);
-
-renderUI();
-</script>
-</body>
-</html>
+      if(strikeVal) S.K = strike
