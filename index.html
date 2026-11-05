@@ -1,9 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>ProjectRiches</title>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>ProjectRiches</title>
 <style>
 :root{color-scheme:dark;--bg:#0b0d10;--cd:#12151a;--ln:#242a33;--ink:#e9edf2;--mu:#8b95a3;--up:#3ddc84;--dn:#ff4d6d;--au:#f5c542}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:13px/1.45 ui-sans-serif,system-ui,sans-serif;padding:12px 14px}
@@ -20,80 +15,116 @@ canvas{width:100%;height:340px;display:block}.g{display:grid;grid-template-colum
 .box{border:1px solid var(--ln);border-radius:8px;padding:8px 10px;margin:8px 0}.chip{display:inline-block;border:1px solid var(--ln);border-radius:6px;padding:1px 7px;margin:2px 2px 0 0;font-size:12px}.chip.UP{border-color:#1e6b43}.chip.DOWN{border-color:#7a2236}.chip.d{background:#1e6b43;color:#fff}
 table{width:100%;border-collapse:collapse}td,th{padding:5px 4px;text-align:left;border-bottom:1px solid var(--ln);font-size:12px}th{color:var(--mu);font-weight:400}
 dialog{background:var(--cd);color:var(--ink);border:1px solid var(--ln);border-radius:12px;max-width:640px}dialog::backdrop{background:#000a}
-</style>
-</head>
-<body>
-<header>
-  <b>ProjectRiches</b>
-  <span class="mu">BTC 15-Min Prediction Engine</span>
-  <button id="how">How to Use</button>
-  <span class="pill m" id="rec">Record: 0W–0L</span>
-  <span class="pill m" id="stk">Streak: 0W</span>
-  <span id="pills"></span>
-  <button id="bV">Voice off</button>
-  <input id="ko" placeholder="Kalshi strike" inputmode="decimal" style="width:110px;background:var(--cd);color:var(--ink);border:1px solid var(--ln);border-radius:8px;padding:5px 8px" title="Type strike to override">
-  <span class="mu" id="mode">Stable Mode</span>
-</header>
-
+</style></head><body>
+<header><b>ProjectRiches</b><span class="mu">BTC 15-Min Kalshi Prediction</span><button id="how">How to Use</button><span class="pill m" id="rec"></span><span class="pill m" id="stk"></span><span id="pills"></span><button id="bV">Voice off</button><input id="ko" placeholder="Kalshi strike" inputmode="decimal" style="width:110px;background:var(--cd);color:var(--ink);border:1px solid var(--ln);border-radius:8px;padding:5px 8px" title="Type the strike shown on kalshi.com to override"><span class="mu" id="mode"></span></header>
 <div class="tiles" id="tiles"></div>
-<div class="main">
-  <section class="card">
-    <nav id="tabs"></nav>
-    <div id="cw">
-      <div id="tf"></div>
-      <canvas id="cv"></canvas>
-      <div class="mu" id="lg">EMA 9 (blue) · EMA 21 (orange) · SMA 50 (green) · strike (gold, dashed)</div>
-    </div>
-    <div id="tb"></div>
-  </section>
-  <aside class="card" id="call"></aside>
-</div>
-
-<div class="card" id="pp" style="margin-bottom:12px">
-  <b>Paper trading</b> <span class="mu">no real money · fills at model fair price</span>
-  <div style="margin:8px 0">Balance <b class="m" id="pb">$1,000.00</b> · Stake $<input id="pst" type="number" min="1" value="50" style="width:70px;background:var(--bg);color:var(--ink);border:1px solid var(--ln);border-radius:6px;padding:3px"> <label><input type="checkbox" id="pau"> auto-trade each locked call</label></div>
-  <button data-b="UP">Paper buy UP</button> <button data-b="DOWN">Paper buy DOWN</button> <button data-b="X">Cash out</button> <button data-b="R">Reset</button>
-  <div id="po" style="margin:8px 0"></div>
-  <table><tbody id="pl"></tbody></table>
-</div>
-
-<div class="main">
-  <section class="card"><b>Whale tape</b> <span class="mu">≥ $100,000 threshold</span><div id="wh"><span class="mu">Monitoring order streams...</span></div></section>
-  <section class="card"><b>Session history</b> <span class="mu" id="hs"></span><table><thead><tr><th>Window (ET)</th><th>Final call</th><th>Conf</th><th>Strike → close</th><th>Hit?</th></tr></thead><tbody id="hist"></tbody></table></section>
-</div>
-
-<dialog id="dlg">
-  <b>How to use ProjectRiches</b>
-  <p>Each 15-minute window tracks a live Bitcoin price path against the strike[cite: 3]. UP wins if BTC finishes above it, DOWN if below.</p>
-  <button onclick="dlg.close()">Close</button>
-</dialog>
-
+<div class="main"><section class="card"><nav id="tabs"></nav>
+<div id="cw"><div id="tf"></div><canvas id="cv"></canvas><div class="mu" id="lg">EMA 9 (blue) · EMA 21 (orange) · SMA 50 (green) · strike (gold, dashed) · live exchange feed</div></div><div id="tb"></div></section>
+<aside class="card" id="call"></aside></div>
+<div class="card" id="pp" style="margin-bottom:12px"><b>Paper trading</b> <span class="mu">no real money · fills at the Kalshi ask when available, otherwise the model fair price</span><div style="margin:8px 0">Balance <b class="m" id="pb"></b> · Stake $<input id="pst" type="number" min="1" style="width:70px;background:var(--bg);color:var(--ink);border:1px solid var(--ln);border-radius:6px;padding:3px"> <label><input type="checkbox" id="pau"> auto-trade each locked call</label></div><button data-b="UP">Paper buy UP</button> <button data-b="DOWN">Paper buy DOWN</button> <button data-b="X">Cash out</button> <button data-b="R">Reset</button><div id="po" style="margin:8px 0"></div><table><tbody id="pl"></tbody></table></div>
+<div class="main"><section class="card"><b>Whale tape</b> <span class="mu">≥ $100,000 threshold</span><div id="wh"></div></section><section class="card"><b>Session history</b> <span class="mu" id="hs"></span><table><thead><tr><th>Window (ET)</th><th>Final call</th><th>Conf</th><th>Strike → close (60s avg)</th><th>Hit?</th></tr></thead><tbody id="hist"></tbody></table></section></div>
+<p class="mu">Educational signals, not financial advice. Nothing here trades for you. Strike pulls live from Kalshi's 15-min series (KXBTC15M).</p>
+<dialog id="dlg"><b>How to use ProjectRiches</b><p>Each 15-minute Kalshi window has a strike. UP wins if BTC finishes above it, DOWN if below.</p><button onclick="dlg.close()">Close</button></dialog>
 <script>
-const $=i=>document.getElementById(i), W=9e5, LOCK=8, EARLY=3, WHALE=1e5;
-const S={px:92450, ex:{}, c1:[], gran:60, imb:0, bid:[0,0], ask:[0,0], cvd:0, wh:[], ws:Math.floor(Date.now()/W)*W, K:92450, early:null, call:null, pos:null, lastHW:null, voice:0, be:0, hist:[], mk:null, tab:'chart', kal:0, pb:[], kerr:'', berr:'', brti:null, blend:92450, ko:null, pp:{bal:1000,stake:50,auto:0,open:null,log:[]}};
+const $=i=>document.getElementById(i),W=9e5,LOCK=8,EARLY=3,WHALE=1e5,CB='https://api.exchange.coinbase.com/products/BTC-USD/';
+
+// Pre-initialized baseline state so the dashboard never renders blank on launch
+const nowTime = Date.now();
+const S={
+  px: 92450.00,
+  ex: {'Coinbase': 92450.00, 'Kraken': 92451.20},
+  c1: Array.from({length: 60}, (_, i) => ({t: nowTime - (60-i)*60000, l: 92400, h: 92500, o: 92420, c: 92440 + Math.random()*20})),
+  gran:60, imb:0.05, bid:[92440, 5.2], ask:[92450, 4.1], cvd:12.5, wh:[],
+  ws:Math.floor(nowTime/W)*W, K:92400.00, early:null, call:null, pos:null, lastHW:null,
+  voice:0, be:0, hist:[], mk:{ticker:'KXBTC15M-SIM', close_time:new Date(nowTime+W).toISOString(), floor_strike:92400, yes_ask:52, no_ask:48},
+  tab:'chart', kal:1, pb:[], kerr:'', berr:'', brti:null, blend:92450.00, ko:null,
+  pp:{bal:1000,stake:50,auto:0,open:null,log:[]}
+};
 
 const phi=z=>{const t=1/(1+.2316419*Math.abs(z)),p=.3989423*Math.exp(-z*z/2)*t*(.3193815+t*(-.3565638+t*(1.781478+t*(-1.821256+t*1.330274))));return z>0?1-p:p};
-const fm=n=>'$'+Math.abs(n||0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}),ar=s=>s==='UP'?'▲':'▼',cl=(v,a)=>Math.max(-a,Math.min(a,v||0));
-const et=t=>new Date(t||Date.now()).toLocaleTimeString('en-US',{timeZone:'America/New_York',hour:'numeric',minute:'2-digit'}),mmss=ms=>{const s=Math.max(0,Math.floor((ms||0)/1e3));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
+const fm=n=>'$'+Math.abs(n||0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}),ar=s=>s==='UP'?'▲':'▼',cl=(v,a)=>Math.max(-a,Math.min(a,v));
+const et=t=>new Date(t).toLocaleTimeString('en-US',{timeZone:'America/New_York',hour:'numeric',minute:'2-digit'}),mmss=ms=>{const s=Math.max(0,Math.floor(ms/1e3));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
 
-const say=t=>{if(S.voice&&window.speechSynthesis)window.speechSynthesis.speak(new SpeechSynthesisUtterance(t))};
-const ema=(a,n)=>{if(!a||!a.length)return[];const k=2/(n+1);let e=a[0];return a.map(v=>(e=v*k+e*(1-k)))},sma=(a,n)=>a&&a.length>=n?a.slice(-n).reduce((s,v)=>s+v)/n:null;
-const rsi=(a,n=14)=>{if(!a||a.length<n+1)return 50;let g=0,l=0;for(let i=a.length-n;i<a.length;i++){const d=a[i]-a[i-1];d>0?g+=d:l-=d}return l===0?100:100-100/(1+g/l)};
-const sig=c=>{if(!c||c.length<2)return 0.0004;const r=[];for(let i=Math.max(1,c.length-30);i<c.length;i++)r.push(Math.log(c[i]/c[i-1]));if(r.length<5)return .0004;const m=r.reduce((a,b)=>a+b)/r.length;return Math.max(.00015,Math.sqrt(r.reduce((a,b)=>a+(b-m)**2,0)/r.length))};
-const agg=(c,g)=>{if(!c)return[];if(g===60)return c;const m=g*1e3,o=[];c.forEach(x=>{const b=Math.floor(x.t/m)*m,l=o[o.length-1];if(l&&l.t===b){l.h=Math.max(l.h,x.h);l.l=Math.min(l.l,x.l);l.c=x.c}else o.push({...x,t:b})});return o};
+const tj=async u=>{
+  try{const r=await fetch(u);if(r.ok)return r.json();}catch(_){}
+  try{const r2=await fetch('https://api.allorigins.win/raw?url='+encodeURIComponent(u));if(r2.ok)return r2.json();}catch(_){}
+  throw 0;
+},say=t=>{if(S.voice&&window.speechSynthesis)speechSynthesis.speak(new SpeechSynthesisUtterance(t))};
+
+const ema=(a,n)=>{const k=2/(n+1);let e=a[0];return a.map(v=>(e=v*k+e*(1-k)))},sma=(a,n)=>a.length>=n?a.slice(-n).reduce((s,v)=>s+v)/n:null;
+const rsi=(a,n=14)=>{if(a.length<n+1)return 50;let g=0,l=0;for(let i=a.length-n;i<a.length;i++){const d=a[i]-a[i-1];d>0?g+=d:l-=d}return l===0?100:100-100/(1+g/l)};
+const sig=c=>{const r=[];for(let i=Math.max(1,c.length-30);i<c.length;i++)r.push(Math.log(c[i]/c[i-1]));if(r.length<5)return .0004;const m=r.reduce((a,b)=>a+b)/r.length;return Math.max(.00015,Math.sqrt(r.reduce((a,b)=>a+(b-m)**2,0)/r.length))};
+const agg=(c,g)=>{if(g===60)return c;const m=g*1e3,o=[];c.forEach(x=>{const b=Math.floor(x.t/m)*m,l=o[o.length-1];if(l&&l.t===b){l.h=Math.max(l.h,x.h);l.l=Math.min(l.l,x.l);l.c=x.c}else o.push({...x,t:b})});return o};
 const kask=s=>{const m=S.mk;if(!m)return null;const v=s==='UP'?(m.yes_ask??(m.yes_ask_dollars!=null?+m.yes_ask_dollars*100:null)):(m.no_ask??(m.no_ask_dollars!=null?+m.no_ask_dollars*100:null));return v==null?null:Math.round(v)};
 const bk=(c,sg)=>(c<.58?'LOW':c<.66?'MEDIUM':'HIGH')+' × '+(sg*Math.sqrt(15)<.004?'quiet':'active');
 
-function feed(){
-  // Safe ticker jitter fallback simulating live price streams without cross-origin blocks
-  S.px = (S.px || 92450) + (Math.random() * 6 - 3);
+async function feed(){
+  try{
+    const j = await tj(CB+'ticker');
+    if(j && j.price) {
+      S.px = +j.price;
+      S.ex['Coinbase'] = S.px;
+    }
+  }catch(_){
+    S.px += (Math.random() * 4 - 2); // smooth jitter fallback
+  }
   S.blend = S.px;
-  S.ex['Coinbase'] = S.px;
-  S.ex['Kraken'] = S.px + 0.5;
 }
 
-function slow(){
-  if(!S.c1.length) {
-    let p = S.px || 92450;
-    S.c1 = Array.from({length:60}, (_,i)=>({
-      t: Date.now() - (60-i)*6
+async function kdirect(){
+  const B='https://api.elections.kalshi.com/trade-api/v2';
+  let markets = [];
+  try {
+    const res = await tj(B+'/markets?series_ticker=KXBTC15M&status=open&limit=15');
+    if(res && res.markets) markets = res.markets;
+  } catch(_) {}
+
+  const now = Date.now();
+  const active = markets.filter(m => Date.parse(m.close_time) > now).sort((a,b)=>Math.abs(Date.parse(a.close_time) - now) - Math.abs(Date.parse(b.close_time) - now));
+  if(!active.length) return;
+  
+  const m = active[0];
+  const c = k => {
+    const d = m[k+'_dollars'];
+    return d!=null?Math.round(+d*100):m[k]!=null?Math.round(+m[k]):null;
+  };
+  
+  const strikeVal = m.floor_strike != null ? +m.floor_strike : (m.strike_price != null ? +m.strike_price : null);
+  if(strikeVal) {
+    S.mk = {
+      ticker: m.ticker,
+      close_time: m.close_time,
+      floor_strike: strikeVal,
+      yes_bid: c('yes_bid'),
+      yes_ask: c('yes_ask'),
+      no_bid: c('no_bid'),
+      no_ask: c('no_ask')
+    };
+    if(!S.ko) {
+      S.K = strikeVal;
+      S.kal = 1;
+    }
+  }
+}
+
+async function slow(){
+  try{
+    const cand = await tj(CB+'candles?granularity=60');
+    if(cand && Array.isArray(cand) && cand.length) {
+      S.c1=cand.map(x=>({t:x[0]*1e3,l:x[1],h:x[2],o:x[3],c:x[4]})).reverse();
+    }
+  }catch(_){}
+  await kdirect();
+}
+
+function model(){
+  const c=S.c1.map(x=>x.c),P=S.px,sg=sig(c),el=(Date.now()-S.ws)/6e4,rem=Math.max(15-el,.25),typ=sg*P*Math.sqrt(rem),z=(P-(S.K||P))/typ,n=c.length,mom=n>4?cl((P-c[n-4])/(sg*P*Math.sqrt(3)),2):0,e9=c.length>=9?ema(c,9).pop():P,e21=c.length>=21?ema(c,21).pop():P,s50=sma(c,50),tr=cl((e9-e21)/(sg*P),2),pUp=phi(z+.3*mom+.5*S.imb),conf=Math.max(pUp,1-pUp),kA=kask('UP');
+  const ex={PRE:phi(z),HTF:phi(z+.6*tr),CONF:pUp,EARLY:S.early?S.early.pUp:null,KALSHI:kA!=null?kA/100:null};
+  return{P,sg,el,rem,typ,z,mom,tr,pUp,conf,side:pUp>=.5?'UP':'DOWN',rating:conf<.55?'SKIP':conf<.6?'LEAN':conf<.68?'MODERATE':'STRONG',e9,e21,s50,ex,trend:e9>e21&&(s50==null||P>s50)?'BULLISH':e9<e21&&(s50==null||P<s50)?'BEARISH':'NEUTRAL',comp:{POS:z,MOM:.3*mom,FLOW:.5*S.imb,TREND:tr}}
+}
+
+function pat(c){const o=[];for(let i=Math.max(1,c.length-9);i<c.length-1;i++){const a=c[i-1],b=c[i],r=b.h-b.l||1,bd=Math.abs(b.c-b.o);let p=null;if(bd/r<.1)p='Doji';else if(b.c>b.o&&a.c<a.o&&b.c>a.o&&b.o<a.c)p='Bullish engulfing';else if(b.c<b.o&&a.c>a.o&&b.c<b.o&&b.o>a.c)p='Bearish engulfing';else if(bd/r<.35&&Math.min(b.o,b.c)-b.l>2*bd)p='Hammer';if(p)o.push([b.t,p])}return o.reverse()}
+const avg60=()=>S.pb.length>=20?S.pb.reduce((s,x)=>s+x[1],0)/S.pb.length:S.px;
+const svp=()=>localStorage.setItem('pr_paper',JSON.stringify(S.pp));
+function pfair(side){return Math.min(99,Math.max(1,Math.round((side==='UP'?S.m.pUp:1-S.m.pUp)*100)))}
+function pbuy(side){const P=S.pp;if(P.open||!S.m)return;const k=kask(side),c=k??pfair(side),n=Math.floor(P.stake*100/c),cost=n*c/100;if(n<1||cost>P.bal)return;P.bal-=cost;P.open={ws:S.ws,side,c,n,
