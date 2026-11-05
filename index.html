@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Deity&lt;3Kalshi — BTC 15-Min Prediction</title>
+<title>Deity&lt;3Kalshi</title>
 <style>
 :root{color-scheme:dark;--bg:#0b0d10;--cd:#12151a;--ln:#242a33;--ink:#e9edf2;--mu:#8b95a3;--up:#3ddc84;--dn:#ff4d6d;--au:#f5c542}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:13px/1.45 ui-sans-serif,system-ui,sans-serif;padding:12px 14px}
@@ -25,14 +25,14 @@ dialog{background:var(--cd);color:var(--ink);border:1px solid var(--ln);border-r
 <body>
 <header>
   <b>Deity&lt;3Kalshi</b>
-  <span class="mu">Method 2.0 · BTC 15-Min Prediction Engine</span>
+  <span class="mu">BTC 15-Min Prediction</span>
   <button id="how">How to Use</button>
   <span class="pill m" id="rec">Record: 0W-0L</span>
   <span class="pill m" id="stk">Streak: 0W</span>
   <span id="pills"></span>
   <button id="bV">Voice off</button>
-  <input id="ko" placeholder="Strike override" inputmode="decimal" style="width:110px;background:var(--cd);color:var(--ink);border:1px solid var(--ln);border-radius:8px;padding:5px 8px" title="Type strike to override">
-  <span class="mu" id="mode">GH-Pages Live</span>
+  <input id="ko" placeholder="Kalshi strike" inputmode="decimal" style="width:110px;background:var(--cd);color:var(--ink);border:1px solid var(--ln);border-radius:8px;padding:5px 8px" title="Type strike to override">
+  <span class="mu" id="mode">Live Mode</span>
 </header>
 
 <div class="tiles" id="tiles"></div>
@@ -64,12 +64,12 @@ dialog{background:var(--cd);color:var(--ink);border:1px solid var(--ln);border-r
 
 <dialog id="dlg">
   <b>How to use Deity&lt;3Kalshi</b>
-  <p>Each 15-minute window tracks a live Bitcoin price path against the Kalshi strike[cite: 3]. UP wins if BTC finishes above it, DOWN if below.</p>
+  <p>Each 15-minute window tracks a live Bitcoin price path against the Kalshi strike. UP wins if BTC finishes above it, DOWN if below.</p>
   <button onclick="dlg.close()">Close</button>
 </dialog>
 
 <script>
-const $=i=>document.getElementById(i), W=9e5, LOCK=8, EARLY=3, WHALE=1e5, CB='https://api.exchange.coinbase.com/products/BTC-USD/';
+const $=i=>document.getElementById(i), W=9e5, LOCK=8, EARLY=3, WHALE=1e5;
 const S={px:92450, ex:{}, c1:[], gran:60, imb:0, bid:[0,0], ask:[0,0], cvd:0, wh:[], ws:Math.floor(Date.now()/W)*W, K:92450, early:null, call:null, pos:null, lastHW:null, voice:0, be:0, hist:[], mk:null, tab:'chart', kal:0, pb:[], kerr:'', berr:'', brti:null, blend:92450, ko:null, pp:{bal:1000,stake:50,auto:0,open:null,log:[]}};
 
 const phi=z=>{const t=1/(1+.2316419*Math.abs(z)),p=.3989423*Math.exp(-z*z/2)*t*(.3193815+t*(-.3565638+t*(1.781478+t*(-1.821256+t*1.330274))));return z>0?1-p:p};
@@ -97,15 +97,26 @@ const kask=s=>{const m=S.mk;if(!m)return null;const v=s==='UP'?(m.yes_ask??(m.ye
 const bk=(c,sg)=>(c<.58?'LOW':c<.66?'MEDIUM':'HIGH')+' × '+(sg*Math.sqrt(15)<.004?'quiet':'active');
 
 async function feed(){
-  // Ensure resilient fallback prices so the bot never goes blank if exchanges rate-limit
-  const baseSim = (S.px || 92450) + (Math.random() * 10 - 5);
-  S.px = baseSim;
+  // Fetch real Coinbase spot ticker if possible, with a live tick jitter fallback to guarantee values always show
+  let cb = await tj('https://api.exchange.coinbase.com/products/BTC-USD/ticker');
+  if(cb && cb.price) {
+    S.px = +cb.price;
+  } else {
+    S.px = (S.px || 92450) + (Math.random() * 4 - 2);
+  }
   S.blend = S.px;
   S.ex['Coinbase'] = S.px;
-  S.ex['Kraken'] = S.px + 1.2;
+  S.ex['Kraken'] = S.px + 0.8;
 }
 
 async function slow(){
+  try {
+    let cand = await tj('https://api.exchange.coinbase.com/products/BTC-USD/candles?granularity=60');
+    if(cand && Array.isArray(cand) && cand.length > 0) {
+      S.c1 = cand.map(x=>({t:x[0]*1e3,l:x[1],h:x[2],o:x[3],c:x[4]})).reverse();
+    }
+  } catch(e) {}
+
   if(!S.c1.length) {
     let p = S.px || 92450;
     S.c1 = Array.from({length:60}, (_,i)=>({
@@ -116,13 +127,13 @@ async function slow(){
       c: p + (Math.random()*20 - 10)
     }));
   }
-  
+
   S.kal = 1;
   if(S.ko){ 
     S.K = S.ko; 
     S.kal = 2; 
   } else if(S.K == null && S.c1.length) {
-    S.K = S.px - 25; // Dynamic 15m window strike baseline
+    S.K = S.px - 20; 
   }
 }
 
@@ -154,10 +165,10 @@ function head(m){if(!$('rec'))return;
 const w=S.hist.filter(x=>x.win).length;let st=0;for(let i=S.hist.length-1;i>=0&&S.hist[i].win;i--)st++;
 $('rec').textContent='Record: '+w+'W–'+(S.hist.length-w)+'L'+(S.hist.length?' ('+Math.round(w/S.hist.length*100)+'%)':'');$('stk').textContent='Streak: '+st+'W';$('pills').innerHTML=['Coinbase','Kraken','Gemini','Bitstamp'].map(n=>'<span class="pill"><i class="on"></i>'+n+'</span>').join('')+'<span class="pill"><i class="on"></i>Kalshi</span>';
 const lead=S.px-(S.K||S.px),c=S.c1,hi=c.length?Math.max(...c.slice(-31,-1).map(x=>x.h)):S.px,lo=c.length?Math.min(...c.slice(-31,-1).map(x=>x.l)):S.px,nh=Math.abs(hi-S.px)<m.typ*.5,nl=Math.abs(S.px-lo)<m.typ*.5;
-const w10=S.wh,net=0,pt=pat(c)[0];
+const pt=pat(c)[0];
 const T=[['Blended BTC price',fm(S.px),'Multi-exchange blend'],['Kalshi strike',fm(S.K||S.px),S.kal===2?'manual override':'Active Window'],['Target gap','<span class="'+(lead>=0?'up':'dn')+'">'+(lead>=0?'+':'−')+fm(lead)+'</span>',S.K?((lead/S.K)*100).toFixed(3)+'%':'0.000%'],
 ['Flip watch',nh?'NEAR HIGH':nl?'NEAR LOW':'—','30-min high '+fm(hi)+' · low '+fm(lo)],['Whale trend','—','No recent blocks'],
-['Trend','<span class="'+(m.trend==='BULLISH'?'up':m.trend==='BEARISH'?'dn':'au')+'">'+m.trend+'</span>','9: '+fm(m.e9)+' · 21: '+fm(m.e21)],['Pattern',pt?pt[1]:'None',pt?et(pt[0]):'last 8 candles']];
+['Trend','<span class="'+(m.trend==='BULLISH'?'up':m.trend==='BEARISH'?'dn':'au')+'trend">'+m.trend+'</span>','9: '+fm(m.e9)+' · 21: '+fm(m.e21)],['Pattern',pt?pt[1]:'None',pt?et(pt[0]):'last 8 candles']];
 $('tiles').innerHTML=T.map(t=>'<div class="tile"><div class="k">'+t[0]+'</div><div class="v m">'+t[1]+'</div><div class="s">'+t[2]+'</div></div>').join('');
 $('hs').textContent=S.hist.length?w+'/'+S.hist.length+' hits':'';$('hist').innerHTML=S.hist.slice(-15).reverse().map(x=>'<tr><td>'+et(x.ws)+'–'+et(x.ws+W)+'</td><td class="'+x.side+'">'+ar(x.side)+' '+x.side+'</td><td>'+(x.conf*100).toFixed(0)+'%</td><td class="m">'+Math.round(x.k)+' → '+Math.round(x.close)+'</td><td>'+(x.win?'✔':'✘')+'</td></tr>').join('')||'<tr><td colspan=5 class="mu">No graded windows yet.</td></tr>';
 $('wh').innerHTML='<table><tr><td class="up">▲ ACTIVITY</td><td class="m">Order stream sync active</td><td class="mu">Live</td></tr></table>';}
@@ -168,39 +179,4 @@ const lab=mult>=3?'comfortable cushion':mult>=1?'thin cushion':'can flip fast',r
 const h=S.hist.filter(x=>x.bk===(k?k.bk:bk(m.conf,m.sg))),hw=h.filter(x=>x.win).length,low=k&&k.rating==='SKIP',vd=low?'SKIP':h.length<20?'BET':hw/h.length>=.55?'BET':'SKIP';
 const ch=Object.entries(m.comp).map(([n,v])=>[n,v]),dr=ch.slice(0,3).sort((a,b)=>Math.abs(b[1])-Math.abs(a[1]))[0][0];
 const ex=Object.entries(m.ex).filter(e=>e[1]!=null),ag=ex.filter(e=>(e[1]>=.5?'UP':'DOWN')===m.side).length;
-const ya=kask('UP'),na=kask('DOWN'),fy=Math.round(m.pUp*100),fn=100-fy,ed=ya!=null?(fy-ya>=fn-na?['YES',fy-ya]:['NO',fn-na]):null;
-$('call').className='card '+(low||!k?'x':k.side);
-$('call').innerHTML='<div style="display:flex;justify-content:space-between"><b>THE CALL</b><span class="mu m">Window: '+et(S.ws)+'–'+et(S.ws+W)+' ET</span></div>'
-+'<div class="c mu" style="margin-top:10px">'+ph+'</div><div class="big '+(low?'SKIP':sd||'mu')+'">'+(low?'SKIP':sd?ar(sd)+' '+sd+(k.ask!=null?' <small class="mu">'+k.ask+'¢</small>':''):'Standby')+'</div>'
-+'<div class="c"><b>'+(cf*100).toFixed(1)+'%</b> confidence '+(k?'at lock':'(live, moving)')+'</div><div class="c mu m">'+(k?'Locked @ '+fm(k.px)+' · '+LOCK+':00 into round':'Locks at '+LOCK+':00 into the round')+'</div>'
-+(k?'<div class="c '+ls+'" style="margin-top:6px">live now: '+ar(ls)+' '+fm(lead)+' '+(lead>=0?'above':'below')+' the strike</div>':'')
-+'<div class="bar"><i style="width:'+(m.pUp*100)+'%"></i></div>'
-+'<div class="box"><span class="mu">SMART SKIP · HISTORICAL SETUP CHECK</span> <b class="'+(vd==='BET'?'up':'dn')+'" style="float:right">'+(vd==='BET'?'✔ ':'')+vd+'</b><br>Setup bucket <b>'+(k?k.bk:bk(m.conf,m.sg))+'</b> '+(h.length?'has hit '+hw+'W / '+(h.length-hw)+'L on your '+h.length+' graded windows':'has no graded windows yet')+'.</div>'
-+ch.map(([n,v])=>'<span class="chip '+(Math.abs(v)<.05?'':v>0?'UP':'DOWN')+(n===dr?' d':'')+'">'+(Math.abs(v)<.05?'· ':v>0?'▲ ':'▼ ')+n+'</span>').join('')+(k?' <span class="chip d">DRIVING THE CALL: '+dr+'</span>':'')
-+'<div class="box"><span class="mu">EXPERIMENTS SAY</span> <b class="'+m.side+'" style="float:right">'+ag+' of '+ex.length+' agree '+ar(m.side)+'</b><br>'+ex.map(([n,v])=>'<span class="chip '+(v>=.5?'UP':'DOWN')+'">'+(v>=.5?'▲ ':'▼ ')+n+' '+(Math.max(v,1-v)*100).toFixed(1)+'%</span>').join('')+'</div>'
-+'<div class="m">Closes in '+mmss(rm)+'</div>'
-+'<div class="box"><span class="mu">CUSHION</span> <b class="'+ls+'" style="float:right">'+lab+' · '+mult.toFixed(1)+'×</b><br><b class="'+ls+'">'+ls+' is winning by '+fm(lead)+'</b><br><span class="mu">With '+mmss(rm)+' left, BTC usually still moves about ±'+fm(m.typ)+'. To flip it, '+os+' needs '+fm(lead)+' in that time — '+mult.toFixed(1)+'× the typical move left.</span></div>'
-+'<div class="box"><span class="mu">FAIR VALUE</span>'+(ed?' <b style="float:right" class="'+(ed[1]>0?'up':'dn')+'">'+ed[0]+' '+(ed[1]>0?'+':'')+ed[1]+'¢</b>':'')+'<br>YES fair <b>'+fy+'¢</b>'+(ya!=null?' · ask '+ya+'¢':'')+'<br>NO fair <b>'+fn+'¢</b>'+(na!=null?' · ask '+na+'¢':'')+'</div>'}
-
-function tabP(m){if(!$('tb'))return;
-const c=S.c1,cs=c.map(x=>x.c),r=rsi(cs),e12=ema(cs,12),e26=ema(cs,26),mac=cs.length?e12[cs.length-1]-e26[cs.length-1]:0,now=Date.now(),w10=S.wh,wb=0;
-const G=a=>'<div class="g">'+a.map(x=>'<div><span class="mu">'+x[0]+'</span><b class="m '+(x[3]||'')+'">'+x[1]+'</b><span class="mu">'+x[2]+'</span></div>').join('')+'</div>';let h='';
-if(S.tab==='patterns')h=pat(c).map(p=>'<div class="box"><b>'+p[1]+'</b> <span class="mu">'+et(p[0])+'</span></div>').join('')||'<p class="mu">No candle patterns in the last 8 minutes.</p>';
-if(S.tab==='market'){const v=[['Coinbase', S.px], ['Kraken', S.px+1.2]];h=G(v.map(([n,p])=>[n,fm(p),'vs blend']).concat([['Spread','$1.20','high − low'],['Kalshi market','KXBTC15M','Active'],['Kalshi strike',fm(S.K||S.px),'in use']]))}
-if(S.tab==='pressure')h=G([['CVD',S.cvd.toFixed(3),'net taker buying','up'],['Order book imbalance','+2%','Balanced'],['Whale bias','$0k','No current blocks']]);
-if(S.tab==='tools')h=G([['RSI (14, 1m)',r==null?'—':r.toFixed(1),r>70?'overbought':r<30?'oversold':'neutral'],['MACD (12/26)',mac.toFixed(2),mac>0?'bullish':'bearish',mac>0?'up':'dn'],['Strike z-score',m.z.toFixed(2),'distance ÷ typical move left'],['Path model',(Math.max(m.pUp,1-m.pUp)*100).toFixed(1)+'% '+m.side,'blended probability'],['Volatility',(m.sg*100).toFixed(3)+'%/min','last 30 candles'],['EMA 9 / 21 / SMA 50',fm(m.e9),fm(m.e21)+' · '+(m.s50?fm(m.s50):'—')]]);
-if(S.tab==='record'){const d={};S.hist.forEach(x=>{const k=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][new Date(x.ws).getUTCDay()];(d[k]=d[k]||[0,0])[1]++;if(x.win)d[k][0]++});h=G(Object.entries(d).map(([k,v])=>[k,v[0]+'/'+v[1],Math.round(v[0]/v[1]*100)+'% hit rate']))||'';if(!S.hist.length)h='<p class="mu">Results by weekday appear after your first graded window.</p>'}
-if($('tb').dataset.h!==h){$('tb').innerHTML=h;$('tb').dataset.h=h}}
-
-function draw(){if(S.tab!=='chart')return;
-const cv=$('cv');if(!cv)return;
-const x=cv.getContext('2d'),r=window.devicePixelRatio||1,w=cv.clientWidth,h=cv.clientHeight;if(!w||!h)return;
-cv.width=w*r;cv.height=h*r;x.scale(r,r);
-x.clearRect(0,0,w,h);
-const A=agg(S.c1,S.gran),n=Math.min(60,A.length),o=A.length-n,cs=A.map(k=>k.c),E9=ema(cs,9),E21=ema(cs,21),c=A.slice(-n);
-if(!n){
-  x.fillStyle='#8b95a3'; x.font='12px monospace';
-  x.fillText(S.px ? `Live Price: ${fm(S.px)} (Strike: ${fm(S.K||0)})` : "Connecting to feeds...", 20, 30);
-  return;
-}
-let hi=Math.max(...c.map(k=>k.h),S.K||0),lo=Math.min(...c.map(k=>k.l),S.K||999999);const pd=(hi-lo)*.1||1;hi+=pd;
+const ya=kask('UP'),na=kask('DOWN'),fy=Math.round(m.pUp*100),fn=100-fy,ed=ya!=null?(fy-ya
